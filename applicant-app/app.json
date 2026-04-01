@@ -25,7 +25,9 @@
       "package": "com.eloan.applicant",
       "permissions": [
         "CAMERA",
-        "RECORD_AUDIO"
+        "RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "plugins": [
@@ -45,8 +47,11 @@
     "extra": {
       "apiUrl": "http://10.0.0.48:8000/api/auth",
       "googleClientId": "66164215961-49k2sd9e7q7qvs1355206ldr6o9o81o4.apps.googleusercontent.com",
-      "googleAndroidClientId": "YOUR_ANDROID_GOOGLE_CLIENT_ID",
-      "googleIosClientId": "YOUR_IOS_GOOGLE_CLIENT_ID"
+      "googleAndroidClientId": "66164215961-49k2sd9e7q7qvs1355206ldr6o9o81o4.apps.googleusercontent.com",
+        "googleIosClientId": "66164215961-49k2sd9e7q7qvs1355206ldr6o9o81o4.apps.googleusercontent.com",
+        "eas": {
+        "projectId": "93f910d1-9fad-4597-9927-d4b7077005af"
+      }
     }
   }
 }
