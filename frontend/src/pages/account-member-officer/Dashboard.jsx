@@ -71,7 +71,7 @@ export default function AMODashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <StatCard label="Pending Applications" value={stats.pending_applications ?? 0} color="#f59e0b" icon="📋" path="/amo/applications" />
         <StatCard label="Total Members" value={stats.total_members ?? 0} color="#10b981" icon="👥" path="/amo/members" />
-        <StatCard label="Approved This Week" value={stats.recently_approved ?? 0} color="#6366f1" icon="✅" path="/amo/applications?filter=approved" />
+        <StatCard label="Approved This Week" value={stats.recently_approved ?? 0} color="#17236a" icon="✅" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>

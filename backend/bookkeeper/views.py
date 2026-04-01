@@ -157,6 +157,15 @@ class ApplicationDetailView(BookkeeperBaseView):
             application.current_status.status_name == 'Submitted'
         )
 
+        # Applicant profile
+        try:
+            profile = application.user.applicant_profile
+        except Exception:
+            profile = None
+
+        # Liveness check
+        liveness_check = application.liveness_checks.order_by('-created_at').first()
+
         return Response({
             'application': {
                 'id': application.id,
@@ -178,7 +187,41 @@ class ApplicationDetailView(BookkeeperBaseView):
                 'purpose': application.purpose,
                 'application_date': application.application_date.isoformat(),
                 'status': application.current_status.status_name if application.current_status else None,
+                'loan_form_data': application.loan_form_data or {},
+                'approved_at': application.approved_at.isoformat() if application.approved_at else None,
+                'released_at': application.released_at.isoformat() if application.released_at else None,
+                'disbursement_recorded': application.accounting_entries.filter(entry_type='disbursement').exists(),
             },
+            'personal_details': {
+                'contact_number': profile.contact_number if profile else None,
+                'secondary_contact': profile.secondary_contact if profile else None,
+                'civil_status': profile.civil_status if profile else None,
+                'gender': profile.gender if profile else None,
+                'date_of_birth': profile.date_of_birth.isoformat() if profile and profile.date_of_birth else None,
+                'tin': profile.tin if profile else None,
+                'sss_number': profile.sss_number if profile else None,
+                'highest_education': profile.highest_education if profile else None,
+                'present_address': profile.full_address if profile else None,
+                'permanent_address': ', '.join(filter(None, [
+                    profile.permanent_address_line1,
+                    profile.permanent_address_barangay,
+                    profile.permanent_city,
+                    profile.permanent_province,
+                    profile.permanent_zip_code,
+                ])) if profile else None,
+                'employer_name': profile.employer_name if profile else None,
+                'employer_address': profile.employer_address if profile else None,
+                'position': profile.position if profile else None,
+                'employment_category': profile.employment_category if profile else None,
+                'employment_status': profile.employment_status if profile else None,
+                'buksu_id_number': profile.buksu_id_number if profile else None,
+                'monthly_income': str(profile.monthly_income) if profile and profile.monthly_income else None,
+                'net_take_home_pay': str(profile.net_take_home_pay) if profile and profile.net_take_home_pay else None,
+                'years_employed': profile.years_employed if profile else None,
+                'emergency_contact_name': profile.emergency_contact_name if profile else None,
+                'emergency_contact_number': profile.emergency_contact_number if profile else None,
+                'emergency_contact_relationship': profile.emergency_contact_relationship if profile else None,
+            } if profile else None,
             'documents': [
                 {
                     'id': doc.id,
@@ -195,6 +238,16 @@ class ApplicationDetailView(BookkeeperBaseView):
                     'name': f"{comaker.user.firstname} {comaker.user.lastname}",
                     'email': comaker.user.email,
                     'agreed_at': comaker.agreed_at.isoformat(),
+                    'detailed_info': (lambda di: {
+                        'relationship': di.relationship_to_applicant,
+                        'contact_number': di.contact_number,
+                        'address': di.address,
+                        'employer_name': di.employer_name,
+                        'position': di.position,
+                        'monthly_income': str(di.monthly_income) if di.monthly_income else None,
+                        'id_type': di.id_type,
+                        'id_number': di.id_number,
+                    })(comaker.detailed_info) if hasattr(comaker, 'detailed_info') and comaker.detailed_info else None,
                 }
                 for comaker in application.comakers.all()
             ],
@@ -210,6 +263,12 @@ class ApplicationDetailView(BookkeeperBaseView):
                 for v in application.bookkeeper_verifications.all()
             ],
             'face_verification': self._get_face_verification_data(application, request),
+            'liveness_check': {
+                'check_status': liveness_check.check_status,
+                'method': liveness_check.method,
+                'confidence_score': str(liveness_check.confidence_score) if liveness_check.confidence_score else None,
+                'verified_at': liveness_check.verified_at.isoformat() if liveness_check.verified_at else None,
+            } if liveness_check else None,
             'can_review': can_review,
         })
 
@@ -527,6 +586,120 @@ class UnconfirmedPaymentsView(BookkeeperBaseView):
             ],
             'count': unconfirmed.count(),
         })
+
+
+# =============================================================================
+# Active Loans & Disbursement Recording (Bookkeeper)
+# =============================================================================
+
+class BookkeeperActiveLoansView(BookkeeperBaseView):
+    """
+    GET /api/bookkeeper/loans/active/
+    List all Active and Overdue loans so the bookkeeper can record
+    disbursements and monitor accounting entries.
+    """
+    def get(self, request):
+        from loans.models import LoanApplication
+        from .models import LoanAccountingEntry
+        from rest_framework.response import Response
+
+        active_statuses = ['Active', 'Overdue', 'Disbursed']
+        loans = LoanApplication.objects.filter(
+            current_status__status_name__in=active_statuses
+        ).select_related('user', 'loan_type', 'current_status').order_by('-activated_at')
+
+        result = []
+        for loan in loans:
+            has_disbursement_entry = LoanAccountingEntry.objects.filter(
+                application=loan,
+                entry_type='disbursement'
+            ).exists()
+            result.append({
+                'loan_id': loan.id,
+                'borrower': f"{loan.user.firstname} {loan.user.lastname}",
+                'borrower_email': loan.user.email,
+                'loan_type': loan.loan_type.loan_name,
+                'amount_requested': str(loan.amount_requested),
+                'total_payable': str(loan.total_payable) if loan.total_payable else '0.00',
+                'total_paid': str(loan.total_paid),
+                'remaining_balance': str(loan.remaining_balance),
+                'status': loan.current_status.status_name,
+                'loan_health_status': loan.loan_health_status,
+                'activated_at': str(loan.activated_at) if loan.activated_at else None,
+                'released_at': loan.released_at.isoformat() if loan.released_at else None,
+                'approved_at': loan.approved_at.isoformat() if loan.approved_at else None,
+                'disbursement_recorded': has_disbursement_entry,
+            })
+
+        return Response({'loans': result, 'count': len(result)})
+
+
+class RecordDisbursementView(BookkeeperBaseView):
+    """
+    POST /api/bookkeeper/loans/<id>/record-disbursement/
+    Bookkeeper creates an accounting entry for the loan disbursement.
+
+    This is called after the Treasurer releases funds (loan is Active).
+    Request body:
+        notes (optional): Bookkeeping notes
+    """
+    def post(self, request, pk):
+        from loans.models import LoanApplication
+        from .models import LoanAccountingEntry
+        from rest_framework import status as http_status
+        from rest_framework.response import Response
+
+        try:
+            loan = LoanApplication.objects.select_related(
+                'current_status', 'loan_type', 'user'
+            ).get(pk=pk)
+        except LoanApplication.DoesNotExist:
+            return Response({'error': 'Loan not found.'}, status=http_status.HTTP_404_NOT_FOUND)
+
+        allowed_statuses = ['Active', 'Overdue', 'Disbursed']
+        if not loan.current_status or loan.current_status.status_name not in allowed_statuses:
+            return Response(
+                {'error': f'Disbursement can only be recorded for active loans. '
+                          f'Current status: {loan.current_status.status_name if loan.current_status else "Unknown"}'},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        # Prevent double-recording
+        if LoanAccountingEntry.objects.filter(application=loan, entry_type='disbursement').exists():
+            return Response(
+                {'error': 'Disbursement has already been recorded in the books for this loan.'},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        notes = request.data.get('notes', '').strip()
+
+        entry = LoanAccountingEntry.objects.create(
+            application=loan,
+            payment=None,
+            entry_type='disbursement',
+            amount=loan.amount_requested,
+            recorded_by=request.user,
+            notes=notes,
+        )
+
+        return Response({
+            'message': 'Loan disbursement recorded in accounting books.',
+            'entry': {
+                'id': entry.id,
+                'entry_type': entry.entry_type,
+                'amount': str(entry.amount),
+                'recorded_by': f"{request.user.firstname} {request.user.lastname}",
+                'recorded_at': entry.recorded_at.isoformat(),
+                'notes': entry.notes,
+            },
+            'loan': {
+                'loan_id': loan.id,
+                'borrower': f"{loan.user.firstname} {loan.user.lastname}",
+                'loan_type': loan.loan_type.loan_name,
+                'amount_requested': str(loan.amount_requested),
+                'released_at': loan.released_at.isoformat() if loan.released_at else None,
+            },
+        }, status=http_status.HTTP_201_CREATED)
 
 
 # =============================================================================

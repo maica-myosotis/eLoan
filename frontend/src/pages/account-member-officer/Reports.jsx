@@ -53,7 +53,7 @@ export default function AMOReports() {
           <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#1f2937', marginBottom: '1.25rem' }}>Savings & Capital Summary</h2>
           <StatRow label="Total Members" value={sc.total_members ?? 0} color="#6b7280" />
           <StatRow label="Regular Members" value={sc.regular_members ?? 0} color="#10b981" />
-          <StatRow label="Associate Members" value={sc.associate_members ?? 0} color="#6366f1" />
+          <StatRow label="Associate Members" value={sc.associate_members ?? 0} color="#17236a" />
 
           <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0fdf4', borderRadius: '8px' }}>
             <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.25rem' }}>Total Savings</div>
@@ -61,7 +61,7 @@ export default function AMOReports() {
           </div>
           <div style={{ marginTop: '0.75rem', padding: '1rem', background: '#eff6ff', borderRadius: '8px' }}>
             <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.25rem' }}>Total Shared Capital</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#6366f1' }}>₱{parseFloat(sc.total_capital || 0).toLocaleString()}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#17236a' }}>₱{parseFloat(sc.total_capital || 0).toLocaleString()}</div>
           </div>
         </div>
       </div>

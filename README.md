@@ -115,7 +115,7 @@ The venv lives at the **project root** (not inside `backend/`):
 python -m venv venv
 
 # Activate
-venv\Scripts\activate        # Windows
+python -m venv venv       # Windows
 source venv/bin/activate     # Mac/Linux
 
 # Install in this order to avoid conflicts between mediapipe and tensorflow

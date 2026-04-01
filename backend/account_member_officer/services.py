@@ -119,6 +119,31 @@ class MemberService:
         return member
 
     @staticmethod
+    def set_shares(member_id, subscribed_shares, paid_shares):
+        """
+        AMO records share subscription for a member (By-Laws Section 3c & 6).
+
+        Validates:
+        - subscribed_shares >= 20
+        - paid_shares >= 5
+        - paid_shares <= subscribed_shares
+        - member will not exceed 10% of total cooperative subscribed share capital
+        """
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        member = Member.objects.select_related('user').get(pk=member_id)
+        member.subscribed_shares = subscribed_shares
+        member.paid_shares = paid_shares
+        try:
+            member.full_clean(validate_unique=False)
+        except DjangoValidationError as exc:
+            messages = []
+            for errs in exc.message_dict.values():
+                messages.extend(errs)
+            raise ValueError(' '.join(messages))
+        member.save(update_fields=['subscribed_shares', 'paid_shares', 'updated_at'])
+        return member
+
+    @staticmethod
     def get_pending_with_deadline():
         """Return pending applications with days remaining for 30-day decision rule."""
         from datetime import date, timedelta

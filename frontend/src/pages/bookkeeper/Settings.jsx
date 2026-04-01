@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import bookkeeperService from '../../services/bookkeeper.service';
 import authService from '../../services/auth.service';
+import PasswordInput from '../../components/PasswordInput';
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
@@ -255,7 +256,7 @@ export default function Settings() {
                   width: '80px',
                   height: '80px',
                   borderRadius: '50%',
-                  background: profile?.profile_picture ? `url(${profile.profile_picture}) center/cover` : '#6366f1',
+                  background: profile?.profile_picture ? `url(${profile.profile_picture}) center/cover` : '#17236a',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -273,7 +274,7 @@ export default function Settings() {
                   onClick={handlePictureClick}
                   disabled={saving}
                   style={{
-                    background: '#6366f1',
+                    background: '#17236a',
                     color: '#fff',
                     border: 'none',
                     padding: '0.5rem 1rem',
@@ -352,7 +353,7 @@ export default function Settings() {
                 type="submit"
                 disabled={saving}
                 style={{
-                  background: '#6366f1',
+                  background: '#17236a',
                   color: '#fff',
                   border: 'none',
                   padding: '0.75rem 1.5rem',
@@ -383,8 +384,7 @@ export default function Settings() {
             <form onSubmit={handlePasswordSubmit}>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={labelStyle}>Current Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   name="old_password"
                   value={passwordForm.old_password}
                   onChange={handlePasswordChange}
@@ -394,8 +394,7 @@ export default function Settings() {
               </div>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={labelStyle}>New Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   name="new_password"
                   value={passwordForm.new_password}
                   onChange={handlePasswordChange}
@@ -409,8 +408,7 @@ export default function Settings() {
               </div>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={labelStyle}>Confirm New Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   name="confirm_password"
                   value={passwordForm.confirm_password}
                   onChange={handlePasswordChange}
@@ -423,7 +421,7 @@ export default function Settings() {
                 type="submit"
                 disabled={saving}
                 style={{
-                  background: '#6366f1',
+                  background: '#17236a',
                   color: '#fff',
                   border: 'none',
                   padding: '0.75rem 1.5rem',
@@ -524,12 +522,12 @@ export default function Settings() {
                 This will disable your login. Your data will be preserved. Contact an administrator to reactivate.
               </p>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input
-                  type="password"
+                <PasswordInput
                   value={deactivatePassword}
                   onChange={(e) => setDeactivatePassword(e.target.value)}
                   placeholder="Enter password to confirm"
-                  style={{ ...inputStyle, flex: 1, marginBottom: 0 }}
+                  style={{ ...inputStyle, marginBottom: 0 }}
+                  wrapperStyle={{ flex: 1 }}
                 />
                 <button
                   onClick={handleDeactivateAccount}
@@ -596,7 +594,7 @@ function ToggleSwitch({ checked, onChange }) {
         height: '24px',
         borderRadius: '12px',
         border: 'none',
-        background: checked ? '#6366f1' : '#d1d5db',
+        background: checked ? '#17236a' : '#d1d5db',
         cursor: 'pointer',
         position: 'relative',
         transition: 'background 0.2s',

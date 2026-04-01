@@ -127,6 +127,12 @@ class StaffGoogleRegistrationView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if User.objects.filter(employee_id=employee_id).exists():
+            return Response(
+                {'error': f"Employee ID '{employee_id}' is already registered. Please use a different Employee ID."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
             role = Role.objects.get(name=role_name)
         except Role.DoesNotExist:
@@ -234,6 +240,7 @@ class ApplicantRegistrationView(APIView):
             'buksu_id_number', 'employment_category', 'employment_status',
             'office', 'father_name', 'father_occupation', 'father_contact',
             'mother_name', 'mother_occupation', 'mother_contact',
+            'emergency_contact_name', 'emergency_contact_number', 'emergency_contact_relationship',
         ]
         for field in str_fields:
             val = request.data.get(field, '').strip()
@@ -259,6 +266,8 @@ class ApplicantRegistrationView(APIView):
             profile.id_photo = request.FILES['id_photo']
         if 'payslip' in request.FILES:
             profile.payslip = request.FILES['payslip']
+        if 'coe_document' in request.FILES:
+            profile.coe_document = request.FILES['coe_document']
 
         profile.save()
 

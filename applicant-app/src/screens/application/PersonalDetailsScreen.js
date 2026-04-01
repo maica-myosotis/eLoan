@@ -200,7 +200,7 @@ export default function PersonalDetailsScreen({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer} edges={['bottom']}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#17236a" />
         <Text style={styles.loadingText}>Loading your information...</Text>
       </SafeAreaView>
     );
@@ -387,18 +387,62 @@ export default function PersonalDetailsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container:        { flex: 1, backgroundColor: '#f9fafb' },
-  keyboardView:     { flex: 1 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' },
-  loadingText:      { marginTop: 12, fontSize: 16, color: '#6b7280' },
-  progressContainer:{ padding: 16, paddingBottom: 0 },
-  progressBar:      { height: 4, backgroundColor: '#e5e7eb', borderRadius: 2 },
-  progressFill:     { height: '100%', backgroundColor: '#6366f1', borderRadius: 2 },
-  progressText:     { fontSize: 12, color: '#9ca3af', marginTop: 8, textAlign: 'right' },
-  scrollContent:    { padding: 16, paddingTop: 8, paddingBottom: 100 },
-  instructions:     { marginBottom: 16 },
-  instructionTitle: { fontSize: 20, fontWeight: '700', color: '#1f2937' },
-  instructionText:  { fontSize: 14, color: '#6b7280', marginTop: 4 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9fafb',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  progressContainer: {
+    padding: 16,
+    paddingBottom: 0,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 2,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#17236a',
+    borderRadius: 2,
+  },
+  progressText: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginTop: 8,
+    textAlign: 'right',
+  },
+  scrollContent: {
+    padding: 16,
+    paddingTop: 8,
+    paddingBottom: 100,
+  },
+  instructions: {
+    marginBottom: 16,
+  },
+  instructionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  instructionText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 4,
+  },
   section: {
     backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
@@ -421,9 +465,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e5e7eb',
     position: 'absolute', bottom: 0, left: 0, right: 0,
   },
-  backButton:             { flex: 1, backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16, alignItems: 'center', marginRight: 8 },
-  backButtonText:         { color: '#374151', fontSize: 16, fontWeight: '600' },
-  continueButton:         { flex: 2, backgroundColor: '#6366f1', borderRadius: 12, padding: 16, alignItems: 'center' },
-  continueButtonDisabled: { backgroundColor: '#9ca3af' },
-  continueButtonText:     { color: '#fff', fontSize: 16, fontWeight: '600' },
+  backButton: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  backButtonText: {
+    color: '#374151',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  continueButton: {
+    flex: 2,
+    backgroundColor: '#17236a',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  continueButtonDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  continueButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

@@ -82,7 +82,7 @@ export default function Dashboard() {
           icon="&#8634;"
           label="Returned (This Month)"
           value={stats.returned_this_month || 0}
-          color="#6366f1"
+          color="#17236a"
         />
         <StatCard
           icon="&#9200;"

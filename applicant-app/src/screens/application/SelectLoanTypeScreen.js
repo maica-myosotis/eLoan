@@ -376,7 +376,7 @@ export default function SelectLoanTypeScreen({ navigation, route }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer} edges={['bottom']}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#17236a" />
         <Text style={styles.loadingText}>Loading loan types...</Text>
       </SafeAreaView>
     );
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 2,
   },
   progressText: {
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   loanCardSelected: {
-    borderColor: '#6366f1',
+    borderColor: '#17236a',
     backgroundColor: '#f5f3ff',
   },
   loanCardHeader: {
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loanNameSelected: {
-    color: '#6366f1',
+    color: '#17236a',
   },
   comakerBadge: {
     backgroundColor: '#fef3c7',
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e5e7eb',
   },
   continueButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

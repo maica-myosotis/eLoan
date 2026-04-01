@@ -80,7 +80,7 @@ export default function StaffRegister() {
           <h1 className="login-title">Staff Registration</h1>
           <p className="login-subtitle">
             Registering as{' '}
-            <span style={{ fontWeight: 700, color: '#02327a' }}>{role || 'Staff'}</span>
+            <span style={{ fontWeight: 700, color: '#17236a' }}>{role || 'Staff'}</span>
           </p>
         </div>
 

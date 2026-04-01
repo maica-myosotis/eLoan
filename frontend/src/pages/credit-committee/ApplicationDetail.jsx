@@ -301,7 +301,7 @@ export default function ApplicationDetail() {
                       alignItems: 'center',
                       padding: '0.75rem',
                       borderRadius: '0.5rem',
-                      border: decision === 'returned' ? '2px solid #6366f1' : '1px solid #e5e7eb',
+                      border: decision === 'returned' ? '2px solid #17236a' : '1px solid #e5e7eb',
                       background: decision === 'returned' ? '#eef2ff' : '#fff',
                       cursor: 'pointer',
                     }}>

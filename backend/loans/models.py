@@ -121,6 +121,16 @@ class LoanApplication(models.Model):
         blank=True,
         help_text='Date the loan became Active (funds released)'
     )
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When the Credit Committee approved this loan'
+    )
+    released_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When the Treasurer released (disbursed) the funds'
+    )
 
     def __str__(self):
         return f"{self.user} - {self.loan_type.loan_name} - {self.amount_requested}"

@@ -113,7 +113,7 @@ export default function DropdownPicker({
                       {item.label}
                     </Text>
                     {isSelected && (
-                      <Ionicons name="checkmark" size={18} color="#6366f1" />
+                      <Ionicons name="checkmark" size={18} color="#17236a" />
                     )}
                   </TouchableOpacity>
                 );
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionTextSelected: {
-    color: '#6366f1',
+    color: '#17236a',
     fontWeight: '600',
   },
   separator: {

@@ -50,6 +50,12 @@ urlpatterns = [
     path('payments/<int:pk>/confirm/', views.ConfirmPaymentView.as_view(), name='confirm_payment'),
 
     # ==========================================================================
+    # Active Loans & Disbursement Recording
+    # ==========================================================================
+    path('loans/active/', views.BookkeeperActiveLoansView.as_view(), name='active_loans'),
+    path('loans/<int:pk>/record-disbursement/', views.RecordDisbursementView.as_view(), name='record_disbursement'),
+
+    # ==========================================================================
     # Reports
     # ==========================================================================
     path('reports/', views.ReportsView.as_view(), name='reports'),

@@ -108,6 +108,50 @@ class BookkeeperService {
     }
   }
 
+  async getActiveLoans() {
+    try {
+      const response = await axios.get(`${API_URL}/loans/active/`, getAuthHeaders());
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  async recordDisbursement(loanId, notes = '') {
+    try {
+      const response = await axios.post(
+        `${API_URL}/loans/${loanId}/record-disbursement/`,
+        { notes },
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  async confirmPayment(paymentId, notes = '') {
+    try {
+      const response = await axios.post(
+        `${API_URL}/payments/${paymentId}/confirm/`,
+        { notes },
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  async getUnconfirmedPayments() {
+    try {
+      const response = await axios.get(`${API_URL}/payments/unconfirmed/`, getAuthHeaders());
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
   /**
    * Get reports data
    * @returns {Promise} Various report data

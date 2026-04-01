@@ -257,15 +257,18 @@ const styles = StyleSheet.create({
     color: '#6b7280', 
     fontSize: 14 
   },
-  loginLink: { 
-    color: '#02327a', 
-    fontSize: 14, 
-    fontWeight: '600' },
-  successContainer: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    padding: 30 },
+  loginLink: {
+    color: '#17236a',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Success screen
+  successContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 30,
+  },
   successIconContainer: {
     width: 80, 
     height: 80, 
@@ -298,11 +301,11 @@ const styles = StyleSheet.create({
     lineHeight: 20, 
     marginBottom: 32 
   },
-  loginButton: { 
-    backgroundColor: '#02327a', 
-    borderRadius: 8, 
-    paddingVertical: 14, 
-    paddingHorizontal: 32 
+  loginButton: {
+    backgroundColor: '#17236a',
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
   },
   loginButtonText: { 
     color: '#fff', 

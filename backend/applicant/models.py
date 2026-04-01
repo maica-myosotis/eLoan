@@ -419,6 +419,18 @@ class Member(models.Model):
         default='active'
     )
 
+    # Share subscription (By-Laws Section 3c & 6)
+    subscribed_shares = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Number of shares subscribed. Minimum: 20 (By-Laws Section 3c & 6).',
+    )
+    paid_shares = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Number of shares paid up. Minimum: 5 (By-Laws Section 3c & 6).',
+    )
+
     # Timestamps
     member_since = models.DateField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -430,6 +442,46 @@ class Member(models.Model):
 
     def __str__(self):
         return f"{self.user.firstname} {self.user.lastname} ({self.get_membership_type_display()})"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        errors = {}
+
+        if self.subscribed_shares is not None:
+            if self.subscribed_shares < 20:
+                errors['subscribed_shares'] = (
+                    'A member must subscribe at least 20 shares (By-Laws Section 3c & 6).'
+                )
+            else:
+                # Section 6: no member may hold > 10% of total subscribed share capital.
+                # Only enforced when other members already have subscribed shares.
+                other_total = (
+                    Member.objects
+                    .exclude(pk=self.pk)
+                    .aggregate(total=models.Sum('subscribed_shares'))['total'] or 0
+                )
+                if other_total > 0:
+                    new_total = other_total + self.subscribed_shares
+                    if self.subscribed_shares / new_total > Decimal('0.10'):
+                        errors['subscribed_shares'] = (
+                            f'Subscribed shares ({self.subscribed_shares}) would give this member more than 10% '
+                            f'of total cooperative subscribed share capital '
+                            f'({self.subscribed_shares} of {new_total}). By-Laws Section 6.'
+                        )
+
+        if self.paid_shares is not None:
+            if self.paid_shares < 5:
+                errors['paid_shares'] = (
+                    'A member must pay up at least 5 shares (By-Laws Section 3c & 6).'
+                )
+            if (
+                self.subscribed_shares is not None
+                and self.paid_shares > self.subscribed_shares
+            ):
+                errors['paid_shares'] = 'Paid shares cannot exceed subscribed shares.'
+
+        if errors:
+            raise ValidationError(errors)
 
     @property
     def total_savings(self):

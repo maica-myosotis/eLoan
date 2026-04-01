@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   registerLink: {
-    color: '#02327a',
+    color: '#17236a',
     fontSize: 14,
     fontWeight: '600',
   },

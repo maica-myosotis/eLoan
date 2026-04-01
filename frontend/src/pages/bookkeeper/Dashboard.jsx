@@ -64,7 +64,7 @@ export default function Dashboard() {
           icon="&#128196;"
           label="Pending Review"
           value={stats.total_submitted || 0}
-          color="#6366f1"
+          color="#17236a"
           link="/bookkeeper/applications"
         />
         <StatCard
@@ -97,8 +97,8 @@ export default function Dashboard() {
             <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1f2937', margin: 0 }}>
               Recent Applications
             </h2>
-            <Link to="/bookkeeper/applications" style={{ color: '#6366f1', fontSize: '0.875rem', textDecoration: 'none' }}> 
-              &rarr;
+            <Link to="/bookkeeper/applications" style={{ color: '#6366f1', fontSize: '0.875rem', textDecoration: 'none' }}>
+              View All &rarr;
             </Link>
           </div>
           <div style={{ overflowX: 'auto' }}>
@@ -137,6 +137,22 @@ export default function Dashboard() {
                       </td>
                       <td style={{ ...tdStyle, fontWeight: 600 }}>
                         &#8369;{parseFloat(app.amount_requested).toLocaleString()}
+                      </td>
+                      <td style={tdStyle}>
+                        <Link
+                          to={`/bookkeeper/applications/${app.id}`}
+                          style={{
+                            background: '#17236a',
+                            color: '#fff',
+                            padding: '0.375rem 0.75rem',
+                            borderRadius: '0.375rem',
+                            fontSize: '0.75rem',
+                            textDecoration: 'none',
+                            display: 'inline-block',
+                          }}
+                        >
+                          View
+                        </Link>
                       </td>
                     </tr>
                   ))
@@ -229,7 +245,7 @@ function StatCard({ icon, label, value, color, link }) {
       </div>
       {link && (
         <div style={{ marginTop: '0.5rem' }}>
-          <span style={{ color: '#6366f1', fontSize: '0.75rem' }}>View applications &rarr;</span>
+          <span style={{ color: '#17236a', fontSize: '0.75rem' }}>View applications &rarr;</span>
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import creditCommitteeService from '../../services/creditCommittee.service';
+import PasswordInput from '../../components/PasswordInput';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -248,8 +249,7 @@ export default function Settings() {
               <form onSubmit={handleChangePassword}>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Current Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                     required
@@ -263,8 +263,7 @@ export default function Settings() {
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>New Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -279,8 +278,7 @@ export default function Settings() {
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Confirm New Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required

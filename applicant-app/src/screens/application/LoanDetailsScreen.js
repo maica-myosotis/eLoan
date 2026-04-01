@@ -405,7 +405,7 @@ export default function LoanDetailsScreen({ navigation }) {
             <View style={styles.calculationCard}>
               <Text style={styles.calculationTitle}>Loan Calculation</Text>
               {calculating ? (
-                <ActivityIndicator color="#6366f1" />
+                <ActivityIndicator color="#17236a" />
               ) : (
                 <>
                   <View style={styles.calcRow}>
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 2,
   },
   progressText: {
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   loanTypeCard: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#6366f1',
+    color: '#17236a',
     marginTop: 8,
   },
   calculationCard: {
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     flex: 2,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

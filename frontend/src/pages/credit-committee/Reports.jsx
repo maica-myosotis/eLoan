@@ -74,7 +74,7 @@ export default function Reports() {
           label="Returns to Treasurer"
           value={approval_stats?.returned || 0}
           sublabel="Last 30 days"
-          color="#6366f1"
+          color="#17236a"
         />
       </div>
 
@@ -157,7 +157,7 @@ export default function Reports() {
             <tr>
               <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>Returned to Treasurer</td>
               <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                <span style={{ color: '#6366f1', fontWeight: 600 }}>{approval_stats?.returned || 0}</span>
+                <span style={{ color: '#17236a', fontWeight: 600 }}>{approval_stats?.returned || 0}</span>
               </td>
             </tr>
           </tbody>
@@ -228,7 +228,7 @@ function MonthlyChart({ data }) {
               style={{
                 width: '20px',
                 height: `${(grouped[month].returned / maxValue) * 100}%`,
-                background: '#6366f1',
+                background: '#17236a',
                 borderRadius: '4px 4px 0 0',
                 minHeight: '4px',
               }}
@@ -272,7 +272,7 @@ function LoanTypeChart({ data }) {
             <div style={{ display: 'flex', height: '12px', borderRadius: '6px', overflow: 'hidden', background: '#e5e7eb' }}>
               <div style={{ width: `${(grouped[loanType].approved / total) * 100}%`, background: '#10b981' }} />
               <div style={{ width: `${(grouped[loanType].rejected / total) * 100}%`, background: '#ef4444' }} />
-              <div style={{ width: `${(grouped[loanType].returned / total) * 100}%`, background: '#6366f1' }} />
+              <div style={{ width: `${(grouped[loanType].returned / total) * 100}%`, background: '#17236a' }} />
             </div>
           </div>
         );
@@ -280,7 +280,7 @@ function LoanTypeChart({ data }) {
       <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
         <LegendItem color="#10b981" label="Approved" />
         <LegendItem color="#ef4444" label="Rejected" />
-        <LegendItem color="#6366f1" label="Returned" />
+        <LegendItem color="#17236a" label="Returned" />
       </div>
     </div>
   );

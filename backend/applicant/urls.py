@@ -57,6 +57,7 @@ urlpatterns = [
     path('applications/<int:pk>/withdraw/', views.WithdrawApplicationView.as_view(), name='withdraw_application'),
     path('applications/<int:pk>/delete/', views.DeleteDraftApplicationView.as_view(), name='delete_draft_application'),
     path('applications/<int:pk>/download-pdf/', views.DownloadApplicationPDFView.as_view(), name='download_application_pdf'),
+    path('applications/<int:pk>/schedule/', views.LoanScheduleView.as_view(), name='loan_schedule'),
 
     # Documents
     path('applications/<int:app_id>/documents/', views.DocumentListView.as_view(), name='documents'),

@@ -42,7 +42,7 @@ const STEP_TITLES = [
   'Personal Details',
   'Home Addresses',
   'Employment',
-  'Parents',
+  'Family & Emergency',
   'Beneficiaries',
   'Documents',
 ];
@@ -82,6 +82,139 @@ function Dropdown({ label, value, options, onChange, placeholder = 'Select...', 
             ))}
           </View>
         </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+}
+
+// ─── Date Picker ─────────────────────────────────────────────────────────────
+const MONTHS_LIST = [
+  { label: 'January', value: '01' }, { label: 'February', value: '02' },
+  { label: 'March', value: '03' },   { label: 'April', value: '04' },
+  { label: 'May', value: '05' },     { label: 'June', value: '06' },
+  { label: 'July', value: '07' },    { label: 'August', value: '08' },
+  { label: 'September', value: '09' },{ label: 'October', value: '10' },
+  { label: 'November', value: '11' }, { label: 'December', value: '12' },
+];
+
+function DatePickerField({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+
+  const _cur = new Date().getFullYear();
+  const YEARS = Array.from({ length: _cur - 18 - (_cur - 100) + 1 }, (_, i) => String(_cur - 100 + i));
+
+  const getDaysInMonth = (y, m) => (!y || !m ? 31 : new Date(parseInt(y), parseInt(m), 0).getDate());
+
+  const initParts = () => {
+    if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      const [y, m, d] = value.split('-');
+      return { y, m, d };
+    }
+    return { y: String(_cur - 25), m: '01', d: '01' };
+  };
+
+  const [selYear, setSelYear] = useState(() => initParts().y);
+  const [selMonth, setSelMonth] = useState(() => initParts().m);
+  const [selDay, setSelDay] = useState(() => initParts().d);
+
+  const DAYS = Array.from(
+    { length: getDaysInMonth(selYear, selMonth) },
+    (_, i) => String(i + 1).padStart(2, '0'),
+  );
+
+  const confirm = () => {
+    const maxDay = getDaysInMonth(selYear, selMonth);
+    const safeDay = String(Math.min(parseInt(selDay, 10), maxDay)).padStart(2, '0');
+    onChange(`${selYear}-${selMonth}-${safeDay}`);
+    setSelDay(safeDay);
+    setOpen(false);
+  };
+
+  const displayValue = (() => {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const [y, m, d] = value.split('-');
+    const mon = MONTHS_LIST.find(mo => mo.value === m);
+    return `${mon ? mon.label : m} ${parseInt(d, 10)}, ${y}`;
+  })();
+
+  return (
+    <View>
+      <TouchableOpacity style={dd.btn} onPress={() => setOpen(true)} activeOpacity={0.7}>
+        <Text style={[dd.btnText, !displayValue && dd.placeholder]}>
+          {displayValue || 'Select date of birth'}
+        </Text>
+        <Text style={dd.arrow}>📅</Text>
+      </TouchableOpacity>
+
+      <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
+        <View style={dp.overlay}>
+          <View style={dp.sheet}>
+            <View style={dp.header}>
+              <Text style={dp.title}>Date of Birth</Text>
+              <TouchableOpacity onPress={() => setOpen(false)}>
+                <Text style={dp.cancel}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={dp.columns}>
+              {/* Month */}
+              <View style={dp.colWrap}>
+                <Text style={dp.colLabel}>Month</Text>
+                <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
+                  {MONTHS_LIST.map(m => (
+                    <TouchableOpacity
+                      key={m.value}
+                      style={[dp.item, selMonth === m.value && dp.itemSel]}
+                      onPress={() => setSelMonth(m.value)}
+                    >
+                      <Text style={[dp.itemText, selMonth === m.value && dp.itemTextSel]}>
+                        {m.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {/* Day */}
+              <View style={[dp.colWrap, { flex: 0, width: 72 }]}>
+                <Text style={dp.colLabel}>Day</Text>
+                <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
+                  {DAYS.map(d => (
+                    <TouchableOpacity
+                      key={d}
+                      style={[dp.item, selDay === d && dp.itemSel]}
+                      onPress={() => setSelDay(d)}
+                    >
+                      <Text style={[dp.itemText, selDay === d && dp.itemTextSel]}>
+                        {parseInt(d, 10)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {/* Year */}
+              <View style={[dp.colWrap, { flex: 0, width: 84 }]}>
+                <Text style={dp.colLabel}>Year</Text>
+                <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
+                  {YEARS.map(y => (
+                    <TouchableOpacity
+                      key={y}
+                      style={[dp.item, selYear === y && dp.itemSel]}
+                      onPress={() => setSelYear(y)}
+                    >
+                      <Text style={[dp.itemText, selYear === y && dp.itemTextSel]}>{y}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+
+            <TouchableOpacity style={dp.confirmBtn} onPress={confirm}>
+              <Text style={dp.confirmText}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -178,7 +311,7 @@ function CameraFrameModal({ visible, onClose, onCapture, frameType = 'square' })
               <Text style={cam.hintText}>
                 {frameType === 'square'
                   ? 'Position your face within the frame'
-                  : 'Align your payslip within the frame'}
+                  : 'Align your document within the frame'}
               </Text>
             </View>
 
@@ -264,9 +397,15 @@ export default function RegisterWizardScreen({ navigation }) {
   const [benDob, setBenDob] = useState('');
   const [benContact, setBenContact] = useState('');
 
+  // ── Step 4 (extra): Emergency Contact ──
+  const [emergencyName, setEmergencyName] = useState('');
+  const [emergencyNumber, setEmergencyNumber] = useState('');
+  const [emergencyRelationship, setEmergencyRelationship] = useState('');
+
   // ── Step 6: Documents ──
   const [idPhoto, setIdPhoto] = useState(null);
   const [payslip, setPayslip] = useState(null);
+  const [coeDoc, setCoeDoc] = useState(null);
 
   // ── Camera modal ──
   const [cameraVisible, setCameraVisible] = useState(false);
@@ -323,9 +462,14 @@ export default function RegisterWizardScreen({ navigation }) {
       if (!office.trim()) return setError('Office/Department is required.') || false;
       if (!monthlyIncome.trim()) return setError('Monthly income is required.') || false;
     }
+    if (step === 4) {
+      if (!emergencyName.trim()) return setError('Emergency contact name is required.') || false;
+      if (!emergencyNumber.trim()) return setError('Emergency contact number is required.') || false;
+    }
     if (step === 6) {
       if (!idPhoto) return setError('2x2 ID photo is required.') || false;
       if (!payslip) return setError('Payslip is required.') || false;
+      if (!coeDoc) return setError('Certificate of Employment is required.') || false;
     }
     return true;
   };
@@ -437,6 +581,9 @@ export default function RegisterWizardScreen({ navigation }) {
       formData.append('mother_name', motherName.trim());
       formData.append('mother_occupation', motherOccupation.trim());
       formData.append('mother_contact', motherContact.trim());
+      formData.append('emergency_contact_name', emergencyName.trim());
+      formData.append('emergency_contact_number', emergencyNumber.trim());
+      formData.append('emergency_contact_relationship', emergencyRelationship.trim());
       formData.append('beneficiaries', JSON.stringify(beneficiaries));
 
       if (idPhoto) {
@@ -453,6 +600,14 @@ export default function RegisterWizardScreen({ navigation }) {
           uri: payslip.uri,
           type: `image/${ext}`,
           name: `payslip.${ext}`,
+        });
+      }
+      if (coeDoc) {
+        const ext = coeDoc.uri.split('.').pop() || 'jpg';
+        formData.append('coe_document', {
+          uri: coeDoc.uri,
+          type: `image/${ext}`,
+          name: `coe_document.${ext}`,
         });
       }
 
@@ -520,10 +675,7 @@ export default function RegisterWizardScreen({ navigation }) {
         <Dropdown value={gender} options={GENDER_OPTIONS} onChange={setGender} placeholder="Select gender" />
       </Field>
       <Field label="Date of Birth" required>
-        <Input
-          placeholder="YYYY-MM-DD" value={dob} onChangeText={setDob}
-          keyboardType="numeric"
-        />
+        <DatePickerField value={dob} onChange={setDob} />
       </Field>
       <Field label="Citizenship" required>
         <Input placeholder="Filipino" value={citizenship} onChangeText={setCitizenship} autoCapitalize="words" />
@@ -681,6 +833,17 @@ export default function RegisterWizardScreen({ navigation }) {
       <Field label="Mother's Contact Number">
         <Input placeholder="09XXXXXXXXX" value={motherContact} onChangeText={setMotherContact} keyboardType="phone-pad" />
       </Field>
+
+      <SectionTitle title="Emergency Contact" />
+      <Field label="Full Name" required>
+        <Input placeholder="Full name of contact person" value={emergencyName} onChangeText={setEmergencyName} autoCapitalize="words" />
+      </Field>
+      <Field label="Contact Number" required>
+        <Input placeholder="09XXXXXXXXX" value={emergencyNumber} onChangeText={setEmergencyNumber} keyboardType="phone-pad" />
+      </Field>
+      <Field label="Relationship">
+        <Input placeholder="e.g. Spouse, Parent, Sibling" value={emergencyRelationship} onChangeText={setEmergencyRelationship} autoCapitalize="words" />
+      </Field>
     </View>
   );
 
@@ -786,6 +949,30 @@ export default function RegisterWizardScreen({ navigation }) {
             <Text style={s.docBtnSub}>with frame guide</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.docBtn} onPress={() => pickImage(setPayslip, false)}>
+            <Text style={s.docBtnIcon}>🖼️</Text>
+            <Text style={s.docBtnText}>Choose from Gallery</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Certificate of Employment */}
+      <SectionTitle title="Certificate of Employment *" />
+      <Text style={s.docHint}>Upload your Certificate of Employment (COE) as proof of employment status.</Text>
+      {coeDoc ? (
+        <View style={s.photoPreviewWrap}>
+          <Image source={{ uri: coeDoc.uri }} style={s.payslipPreview} />
+          <TouchableOpacity style={s.retakeBtn} onPress={() => setCoeDoc(null)}>
+            <Text style={s.retakeBtnText}>Remove</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={s.docBtns}>
+          <TouchableOpacity style={s.docBtn} onPress={() => openCamera(setCoeDoc, 'rect')}>
+            <Text style={s.docBtnIcon}>📷</Text>
+            <Text style={s.docBtnText}>Take Photo</Text>
+            <Text style={s.docBtnSub}>with frame guide</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={s.docBtn} onPress={() => pickImage(setCoeDoc, false)}>
             <Text style={s.docBtnIcon}>🖼️</Text>
             <Text style={s.docBtnText}>Choose from Gallery</Text>
           </TouchableOpacity>
@@ -906,6 +1093,35 @@ const dd = StyleSheet.create({
   itemText: { flex: 1, fontSize: 15, color: '#1f2937' },
   itemTextActive: { color: '#02327a', fontWeight: '600' },
   check: { fontSize: 14, color: '#02327a', fontWeight: '700' },
+});
+
+// ─── Date Picker Styles ───────────────────────────────────────────────────────
+const dp = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 28 },
+  header: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12,
+    borderBottomWidth: 1, borderBottomColor: '#f3f4f6',
+  },
+  title: { fontSize: 16, fontWeight: '700', color: '#1f2937' },
+  cancel: { fontSize: 14, color: '#6b7280' },
+  columns: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 12, gap: 8 },
+  colWrap: { flex: 1 },
+  colLabel: {
+    fontSize: 11, fontWeight: '700', color: '#9ca3af', textAlign: 'center',
+    textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6,
+  },
+  col: { height: 210, borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 10 },
+  item: { paddingVertical: 11, paddingHorizontal: 8, alignItems: 'center' },
+  itemSel: { backgroundColor: '#eff6ff' },
+  itemText: { fontSize: 14, color: '#374151' },
+  itemTextSel: { color: '#02327a', fontWeight: '700' },
+  confirmBtn: {
+    marginHorizontal: 20, marginTop: 16, backgroundColor: '#02327a',
+    borderRadius: 10, paddingVertical: 14, alignItems: 'center',
+  },
+  confirmText: { color: '#fff', fontWeight: '700', fontSize: 16 },
 });
 
 // ─── Main Styles ──────────────────────────────────────────────────────────────

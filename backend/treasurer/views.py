@@ -331,6 +331,7 @@ class ReleaseFundsView(TreasurerBaseView):
             'loan_id': application.id,
             'status': application.current_status.status_name,
             'activated_at': str(application.activated_at),
+            'released_at': application.released_at.isoformat() if application.released_at else None,
             'loan_health_status': application.loan_health_status,
             'payment_schedule': [
                 {
@@ -416,9 +417,11 @@ class RecordPaymentView(TreasurerBaseView):
         application = get_object_or_404(LoanApplication, pk=pk)
 
         # Validate status
-        if not application.current_status or application.current_status.status_name != 'Disbursed':
+        allowed_payment_statuses = ['Active', 'Overdue', 'Disbursed']
+        if not application.current_status or application.current_status.status_name not in allowed_payment_statuses:
             return Response(
-                {'error': 'Payments can only be recorded for disbursed loans.'},
+                {'error': f'Payments can only be recorded for active loans. '
+                          f'Current status: {application.current_status.status_name if application.current_status else "Unknown"}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -507,6 +510,10 @@ class LoanMonitoringView(TreasurerBaseView):
                     'remaining_balance': str(loan.remaining_balance),
                     'total_paid': str(loan.total_paid),
                     'status': loan.current_status.status_name if loan.current_status else 'Unknown',
+                    'loan_health_status': loan.loan_health_status,
+                    'approved_at': loan.approved_at.isoformat() if loan.approved_at else None,
+                    'released_at': loan.released_at.isoformat() if loan.released_at else None,
+                    'activated_at': str(loan.activated_at) if loan.activated_at else None,
                 }
                 for loan in loans
             ],

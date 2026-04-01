@@ -19,7 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import dashboardService from '../services/dashboardService';
 
 // Stats Card Component
-const StatsCard = ({ title, value, icon, color = '#6366f1' }) => (
+const StatsCard = ({ title, value, icon, color = '#17236a' }) => (
   <View style={[styles.statsCard, { borderLeftColor: color }]}>
     <Text style={styles.statsIcon}>{icon}</Text>
     <Text style={styles.statsValue}>{value}</Text>
@@ -143,7 +143,7 @@ export default function DashboardScreen({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#17236a" />
         <Text style={styles.loadingText}>Loading...</Text>
       </SafeAreaView>
     );
@@ -154,7 +154,7 @@ export default function DashboardScreen({ navigation }) {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6366f1']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#17236a']} />
         }
       >
         {/* Header */}
@@ -175,7 +175,7 @@ export default function DashboardScreen({ navigation }) {
             title="Total Apps"
             value={stats?.total_applications || 0}
             icon="📋"
-            color="#6366f1"
+            color="#17236a"
           />
           <StatsCard
             title="Active Loans"
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#6366f1',
+    color: '#17236a',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -350,12 +350,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   applyButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
     marginBottom: 24,
-    shadowColor: '#6366f1',
+    shadowColor: '#17236a',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     color: '#1f2937',
   },
   seeAllLink: {
-    color: '#6366f1',
+    color: '#17236a',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#6366f1',
+    borderLeftColor: '#17236a',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,

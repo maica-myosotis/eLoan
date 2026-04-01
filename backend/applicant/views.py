@@ -29,7 +29,7 @@ from .throttles import (
 )
 
 from shared.services.pdf_service import LoanApplicationPDFService
-from loans.models import AuditLog, FaceVerification
+from loans.models import AuditLog, FaceVerification, LivenessCheck
 
 from .services import (
     ApplicantDashboardService,
@@ -1219,6 +1219,17 @@ class LivenessVideoView(ApplicantBaseView):
 
             overall_passed = passed_frames >= (frames_analyzed * 0.6)  # 60% must pass
 
+            # Persist liveness result so submit_application validation can find it
+            lc_status = 'Verified' if overall_passed else 'Failed'
+            LivenessCheck.objects.filter(loan_application=application).delete()
+            LivenessCheck.objects.create(
+                loan_application=application,
+                method='video',
+                confidence_score=round(avg_confidence, 2),
+                check_status=lc_status,
+                verified_at=timezone.now() if overall_passed else None,
+            )
+
             # Encrypt video file after processing
             from .encryption_utils import FileEncryptionService
             encrypt_success, encrypt_error = FileEncryptionService.encrypt_file(full_path)
@@ -1581,6 +1592,16 @@ class ProfileView(ApplicantBaseView):
         profile = ProfileService.get_or_create_profile(user)
         profile_data = ProfileService.profile_to_dict(profile)
 
+        # Membership info (set by AMO after approval)
+        member = getattr(user, 'member_profile', None)
+        membership_data = {
+            'membership_type': member.membership_type if member else None,
+            'membership_status': member.membership_status if member else None,
+            'subscribed_shares': member.subscribed_shares if member else None,
+            'paid_shares': member.paid_shares if member else None,
+            'member_since': member.member_since.isoformat() if member else None,
+        }
+
         return Response({
             'user': {
                 'id': user.id,
@@ -1589,6 +1610,7 @@ class ProfileView(ApplicantBaseView):
                 'lastname': user.lastname,
             },
             'profile': profile_data,
+            'membership': membership_data,
         })
 
     def put(self, request):
@@ -1777,3 +1799,73 @@ class ArchiveNotificationView(ApplicantBaseView):
         if not success:
             return Response({'error': error}, status=status.HTTP_404_NOT_FOUND)
         return Response({'message': 'Notification archived'})
+
+
+# =============================================================================
+# Loan Payment Schedule (Applicant view of their active loan)
+# =============================================================================
+
+class LoanScheduleView(ApplicantBaseView):
+    """
+    GET /api/applicant/applications/<id>/schedule/
+    Returns the payment schedule and balance summary for an active loan.
+    Scoped to the requesting applicant's own loans only.
+    """
+
+    def get(self, request, pk):
+        from loans.models import LoanApplication, PaymentSchedule
+        from datetime import date
+
+        try:
+            loan = LoanApplication.objects.select_related(
+                'current_status', 'loan_type'
+            ).get(pk=pk, user=request.user)
+        except LoanApplication.DoesNotExist:
+            return Response({'error': 'Loan not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        viewable_statuses = ['Active', 'Overdue', 'Completed', 'Disbursed', 'Closed']
+        current = loan.current_status.status_name if loan.current_status else ''
+        if current not in viewable_statuses:
+            return Response(
+                {'error': 'Payment schedule is not available for this loan status.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        schedule = PaymentSchedule.objects.filter(application=loan).order_by('installment_number')
+
+        today = date.today()
+        next_installment = schedule.filter(
+            status__in=['pending', 'partial', 'late', 'overdue']
+        ).order_by('due_date').first()
+
+        return Response({
+            'loan_summary': {
+                'loan_id': loan.id,
+                'loan_type': loan.loan_type.loan_name,
+                'amount_requested': str(loan.amount_requested),
+                'total_payable': str(loan.total_payable) if loan.total_payable else '0.00',
+                'total_paid': str(loan.total_paid),
+                'remaining_balance': str(loan.remaining_balance),
+                'monthly_amortization': str(loan.monthly_amortization) if loan.monthly_amortization else '0.00',
+                'installment_type': loan.installment_type,
+                'status': current,
+                'loan_health_status': loan.loan_health_status,
+                'activated_at': str(loan.activated_at) if loan.activated_at else None,
+                'released_at': loan.released_at.isoformat() if loan.released_at else None,
+                'next_due_date': str(next_installment.due_date) if next_installment else None,
+                'next_amount_due': str(next_installment.amount_due - next_installment.amount_paid) if next_installment else None,
+            },
+            'schedule': [
+                {
+                    'installment_number': s.installment_number,
+                    'due_date': str(s.due_date),
+                    'amount_due': str(s.amount_due),
+                    'amount_paid': str(s.amount_paid),
+                    'balance_due': str(s.balance_due),
+                    'status': s.status,
+                    'paid_at': s.paid_at.isoformat() if s.paid_at else None,
+                    'is_overdue': s.due_date < today and s.status not in ('paid',),
+                }
+                for s in schedule
+            ],
+        })

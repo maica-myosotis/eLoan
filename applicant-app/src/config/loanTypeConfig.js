@@ -51,7 +51,7 @@ const LOAN_TYPE_CONFIGS = {
     semiMonthlyAllowed: false,
   },
 
-  'Enhanced Regular Loan': { hasExtraStep: false, semiMonthlyAllowed: true  },
+  'Enhanced Regular Loan':  { hasExtraStep: false, semiMonthlyAllowed: true  },
   'Regular Loan':           { hasExtraStep: false, semiMonthlyAllowed: true  },
   'Grace Loan':             { hasExtraStep: false, semiMonthlyAllowed: true  },
   'Calamity Loan':          { hasExtraStep: false, semiMonthlyAllowed: false },

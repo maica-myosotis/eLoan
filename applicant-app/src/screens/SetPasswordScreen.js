@@ -65,7 +65,7 @@ export default function SetPasswordScreen({ navigation, route }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
-          <ActivityIndicator size="large" color="#6366f1" />
+          <ActivityIndicator size="large" color="#17236a" />
           <Text style={styles.loadingText}>Validating reset link...</Text>
         </View>
       </SafeAreaView>
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   submitButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   loginButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   backButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',

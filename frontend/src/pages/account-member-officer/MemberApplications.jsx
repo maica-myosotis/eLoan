@@ -139,33 +139,17 @@ export default function MemberApplications() {
 
       {/* Detail Modal */}
       {modal === 'detail' && selected && (
-        <Modal title="Applicant Details" onClose={() => setModal(null)}>
-          <Detail label="Full Name" value={`${selected.firstname} ${selected.lastname}`} />
-          <Detail label="Email" value={selected.email} />
-          <Detail label="Employee ID" value={selected.employee_id || '—'} />
-          <Detail label="Status" value={selected.account_status} />
-          <Detail label="Date Applied" value={new Date(selected.date_joined).toLocaleString()} />
-          {selected.approved_at && <Detail label="Approved At" value={new Date(selected.approved_at).toLocaleString()} />}
-          {selected.approved_by && <Detail label="Approved By" value={selected.approved_by} />}
-          {selected.rejection_reason && <Detail label="Rejection Reason" value={selected.rejection_reason} />}
-          {selected.account_status === 'pending' && (
-            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem' }}>
-              <button onClick={() => handleApprove(selected.id)} style={{
-                flex: 1, background: '#10b981', color: '#fff', border: 'none', padding: '0.75rem',
-                borderRadius: '8px', fontWeight: 600, cursor: 'pointer',
-              }}>Approve</button>
-              <button onClick={() => setModal('reject')} style={{
-                flex: 1, background: '#ef4444', color: '#fff', border: 'none', padding: '0.75rem',
-                borderRadius: '8px', fontWeight: 600, cursor: 'pointer',
-              }}>Reject</button>
-            </div>
-          )}
-        </Modal>
+        <ApplicationDetailModal
+          data={selected}
+          onClose={() => setModal(null)}
+          onApprove={() => handleApprove(selected.id)}
+          onReject={() => setModal('reject')}
+        />
       )}
 
       {/* Reject Modal */}
       {modal === 'reject' && selected && (
-        <Modal title="Reject Application" onClose={() => setModal(null)}>
+        <Modal title="Reject Application" onClose={() => setModal(null)} maxWidth="480px">
           <p style={{ color: '#4b5563', fontSize: '0.875rem', marginBottom: '1rem' }}>
             Rejecting: <strong>{selected.name || `${selected.firstname} ${selected.lastname}`}</strong>
           </p>
@@ -193,19 +177,267 @@ export default function MemberApplications() {
   );
 }
 
-function Detail({ label, value }) {
+// ─── Full Application Detail Modal ──────────────────────────────────────────
+
+function ApplicationDetailModal({ data, onClose, onApprove, onReject }) {
+  const p = data.profile || {};
+  const badge = STATUS_BADGE[data.account_status] || STATUS_BADGE.pending;
+
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.625rem 0', borderBottom: '1px solid #f3f4f6' }}>
-      <span style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: '0.875rem', color: '#1f2937', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
+    <Modal title="Membership Application" onClose={onClose} maxWidth="760px">
+      {/* Header: name + status */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid #f3f4f6' }}>
+        <div>
+          <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#1f2937' }}>
+            {data.firstname} {p.middle_name ? p.middle_name + ' ' : ''}{data.lastname}
+          </div>
+          <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.2rem' }}>{data.email}</div>
+        </div>
+        <span style={{ background: badge.bg, color: badge.color, padding: '0.3rem 0.9rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+          {badge.label}
+        </span>
+      </div>
+
+      {/* Application Status */}
+      <Section title="Application Status">
+        <Row2>
+          <Field label="Date Applied" value={new Date(data.date_joined).toLocaleString()} />
+          <Field label="Employee ID" value={data.employee_id} />
+        </Row2>
+        <Row2>
+          <Field label="Decision Deadline" value={data.decision_deadline ? new Date(data.decision_deadline).toLocaleDateString() : null} />
+          <Field label="Days Remaining" value={data.days_remaining != null ? `${data.days_remaining} day(s)` : null} />
+        </Row2>
+        {data.approved_at && (
+          <Row2>
+            <Field label="Approved At" value={new Date(data.approved_at).toLocaleString()} />
+            <Field label="Approved By" value={data.approved_by} />
+          </Row2>
+        )}
+        {data.rejection_reason && (
+          <Field label="Rejection Reason" value={data.rejection_reason} full />
+        )}
+      </Section>
+
+      {/* Personal Information */}
+      <Section title="Personal Information">
+        <Row2>
+          <Field label="First Name" value={data.firstname} />
+          <Field label="Middle Name" value={p.middle_name} />
+        </Row2>
+        <Row2>
+          <Field label="Last Name" value={data.lastname} />
+          <Field label="Date of Birth" value={p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString() : null} />
+        </Row2>
+        <Row2>
+          <Field label="Gender" value={p.gender} />
+          <Field label="Civil Status" value={p.civil_status} />
+        </Row2>
+        <Row2>
+          <Field label="Citizenship" value={p.citizenship} />
+          <Field label="Spouse Name" value={p.spouse_name} />
+        </Row2>
+        <Row2>
+          <Field label="Highest Education" value={p.highest_education} />
+          <Field label="TIN" value={p.tin} />
+        </Row2>
+        <Row2>
+          <Field label="SSS Number" value={p.sss_number} />
+          <Field label="Contact Number" value={p.contact_number} />
+        </Row2>
+        <Row2>
+          <Field label="Secondary Contact" value={p.secondary_contact} />
+        </Row2>
+      </Section>
+
+      {/* Present Address */}
+      <Section title="Present Address">
+        <Row2>
+          <Field label="Street / House No." value={p.address_line1} />
+          <Field label="Barangay" value={p.address_line2} />
+        </Row2>
+        <Row2>
+          <Field label="City / Municipality" value={p.city} />
+          <Field label="Province" value={p.province} />
+        </Row2>
+        <Row2>
+          <Field label="ZIP Code" value={p.zip_code} />
+        </Row2>
+      </Section>
+
+      {/* Permanent Address */}
+      <Section title="Permanent Address">
+        <Row2>
+          <Field label="Street / House No." value={p.permanent_address_line1} />
+          <Field label="Barangay" value={p.permanent_address_barangay} />
+        </Row2>
+        <Row2>
+          <Field label="City / Municipality" value={p.permanent_city} />
+          <Field label="Province" value={p.permanent_province} />
+        </Row2>
+        <Row2>
+          <Field label="ZIP Code" value={p.permanent_zip_code} />
+        </Row2>
+      </Section>
+
+      {/* Employment Information */}
+      <Section title="Employment Information">
+        <Row2>
+          <Field label="Employment Category" value={p.employment_category} />
+          <Field label="Employment Status" value={p.employment_status} />
+        </Row2>
+        <Row2>
+          <Field label="BukSU ID Number" value={p.buksu_id_number} />
+          <Field label="Office / Department" value={p.office} />
+        </Row2>
+        <Row2>
+          <Field label="Position" value={p.position} />
+          <Field label="Years Employed" value={p.years_employed != null ? String(p.years_employed) : null} />
+        </Row2>
+        <Row2>
+          <Field label="Employer Name" value={p.employer_name} />
+          <Field label="Monthly Income" value={p.monthly_income ? `₱${Number(p.monthly_income).toLocaleString('en-PH', { minimumFractionDigits: 2 })}` : null} />
+        </Row2>
+        <Row2>
+          <Field label="Net Take-Home Pay" value={p.net_take_home_pay ? `₱${Number(p.net_take_home_pay).toLocaleString('en-PH', { minimumFractionDigits: 2 })}` : null} />
+        </Row2>
+        {p.employer_address && <Field label="Employer Address" value={p.employer_address} full />}
+      </Section>
+
+      {/* Parents / Family Background */}
+      <Section title="Family Background">
+        <Row2>
+          <Field label="Father's Name" value={p.father_name} />
+          <Field label="Father's Occupation" value={p.father_occupation} />
+        </Row2>
+        <Row2>
+          <Field label="Father's Contact" value={p.father_contact} />
+        </Row2>
+        <Row2>
+          <Field label="Mother's Name" value={p.mother_name} />
+          <Field label="Mother's Occupation" value={p.mother_occupation} />
+        </Row2>
+        <Row2>
+          <Field label="Mother's Contact" value={p.mother_contact} />
+        </Row2>
+      </Section>
+
+      {/* Emergency Contact */}
+      <Section title="Emergency Contact">
+        <Row2>
+          <Field label="Name" value={p.emergency_contact_name} />
+          <Field label="Relationship" value={p.emergency_contact_relationship} />
+        </Row2>
+        <Row2>
+          <Field label="Contact Number" value={p.emergency_contact_number} />
+        </Row2>
+      </Section>
+
+      {/* Beneficiaries */}
+      <Section title="Beneficiaries">
+        {(!data.beneficiaries || data.beneficiaries.length === 0) ? (
+          <p style={{ color: '#9ca3af', fontSize: '0.8rem' }}>No beneficiaries declared.</p>
+        ) : (
+          data.beneficiaries.map((b, i) => (
+            <div key={i} style={{ background: '#f9fafb', borderRadius: '8px', padding: '0.75rem', marginBottom: '0.5rem' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1f2937', marginBottom: '0.4rem' }}>Beneficiary {i + 1}</div>
+              <Row2>
+                <Field label="Name" value={b.name} />
+                <Field label="Relationship" value={b.relationship} />
+              </Row2>
+              <Row2>
+                <Field label="Date of Birth" value={b.date_of_birth ? new Date(b.date_of_birth).toLocaleDateString() : null} />
+                <Field label="Contact Number" value={b.contact_number} />
+              </Row2>
+            </div>
+          ))
+        )}
+      </Section>
+
+      {/* Documents */}
+      <Section title="Submitted Documents">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <DocLink label="ID Photo" url={p.id_photo} />
+          <DocLink label="Payslip" url={p.payslip} />
+          <DocLink label="Certificate of Employment" url={p.coe_document} />
+        </div>
+      </Section>
+
+      {/* Actions */}
+      {data.account_status === 'pending' && (
+        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem' }}>
+          <button onClick={onApprove} style={{
+            flex: 1, background: '#10b981', color: '#fff', border: 'none', padding: '0.75rem',
+            borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem',
+          }}>Approve Application</button>
+          <button onClick={onReject} style={{
+            flex: 1, background: '#ef4444', color: '#fff', border: 'none', padding: '0.75rem',
+            borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem',
+          }}>Reject Application</button>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
+// ─── Helper Components ───────────────────────────────────────────────────────
+
+function Section({ title, children }) {
+  return (
+    <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{
+        fontSize: '0.7rem', fontWeight: 700, color: '#17236a', textTransform: 'uppercase',
+        letterSpacing: '0.08em', marginBottom: '0.75rem', paddingBottom: '0.4rem',
+        borderBottom: '2px solid #e0e7ff',
+      }}>{title}</div>
+      {children}
     </div>
   );
 }
 
-function Modal({ title, children, onClose }) {
+function Row2({ children }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '1.5rem', width: '100%', maxWidth: '480px', maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem', marginBottom: '0.5rem' }}>
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, value, full }) {
+  const content = (
+    <div style={{ marginBottom: '0.5rem' }}>
+      <div style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+      <div style={{ fontSize: '0.875rem', color: value ? '#1f2937' : '#d1d5db', marginTop: '0.1rem', wordBreak: 'break-word' }}>
+        {value || '—'}
+      </div>
+    </div>
+  );
+  return full ? <div style={{ gridColumn: '1 / -1' }}>{content}</div> : content;
+}
+
+function DocLink({ label, url }) {
+  return (
+    <div style={{
+      border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0.75rem',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem',
+    }}>
+      <span style={{ fontSize: '0.8rem', color: '#374151', fontWeight: 500 }}>{label}</span>
+      {url ? (
+        <a href={url} target="_blank" rel="noreferrer" style={{
+          fontSize: '0.75rem', color: '#17236a', fontWeight: 600, textDecoration: 'none',
+          background: '#e0e7ff', padding: '0.2rem 0.6rem', borderRadius: '6px',
+        }}>View</a>
+      ) : (
+        <span style={{ fontSize: '0.75rem', color: '#d1d5db' }}>Not submitted</span>
+      )}
+    </div>
+  );
+}
+
+function Modal({ title, children, onClose, maxWidth = '480px' }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+      <div style={{ background: '#fff', borderRadius: '16px', padding: '1.5rem', width: '100%', maxWidth, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1f2937' }}>{title}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: '1.25rem' }}>✕</button>

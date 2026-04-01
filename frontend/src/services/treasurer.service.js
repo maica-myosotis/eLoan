@@ -102,6 +102,34 @@ class TreasurerService {
     }
   }
 
+  async releaseFunds(loanId, remarks = '') {
+    try {
+      const response = await axios.post(
+        `${API_URL}/loans/${loanId}/release/`,
+        { remarks },
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  async getApprovedForDisbursement() {
+    try {
+      // Re-use the active loans report which returns all Active/Disbursed loans.
+      // We also need "Approved – For Disbursement" ones — fetch from monitoring
+      // and filter client-side since no dedicated endpoint exists yet.
+      const response = await axios.get(`${API_URL}/loans/monitoring/`, getAuthHeaders());
+      const all = response.data.loans || [];
+      return {
+        loans: all.filter(l => l.status === 'Approved \u2013 For Disbursement'),
+      };
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
   // =========================================================================
   // Loan Monitoring
   // =========================================================================

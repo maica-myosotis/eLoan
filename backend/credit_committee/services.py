@@ -96,8 +96,10 @@ class DecisionService:
             CreditCommitteeDecision: Created decision record
         """
         # Determine new status
+        # Approved loans go directly to "Approved – For Disbursement" so the
+        # Treasurer can release funds without an extra manual step.
         status_map = {
-            'approved': CreditCommitteeApplicationService.STATUS_APPROVED,
+            'approved': 'Approved – For Disbursement',
             'rejected': CreditCommitteeApplicationService.STATUS_REJECTED,
             'returned': CreditCommitteeApplicationService.STATUS_RETURNED,
         }
@@ -107,9 +109,14 @@ class DecisionService:
             status_name=new_status_name
         )
 
-        # Update application status
+        # Update application status and record approval timestamp
+        update_fields = ['current_status']
         application.current_status = new_status
-        application.save(update_fields=['current_status'])
+        if decision == 'approved':
+            from django.utils import timezone as _tz
+            application.approved_at = _tz.now()
+            update_fields.append('approved_at')
+        application.save(update_fields=update_fields)
 
         # Create decision record (immutable audit trail)
         cc_decision = CreditCommitteeDecision.objects.create(

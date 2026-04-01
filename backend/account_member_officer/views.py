@@ -133,22 +133,85 @@ class MemberApplicationDetailView(AMOBaseView):
         except User.DoesNotExist:
             return Response({'error': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Get COE/membership documents if available
-        coe_document_url = None
-        membership_form_url = None
-        try:
-            profile = u.applicant_profile
-            if profile.coe_document:
-                coe_document_url = request.build_absolute_uri(profile.coe_document.url)
-            if profile.membership_form:
-                membership_form_url = request.build_absolute_uri(profile.membership_form.url)
-        except Exception:
-            pass
-
         # Calculate 30-day deadline
         from datetime import date, timedelta
         days_since = (date.today() - u.date_joined.date()).days
         days_remaining = max(0, 30 - days_since)
+
+        # Build full profile data
+        profile_data = {}
+        beneficiaries = []
+        try:
+            p = u.applicant_profile
+
+            def file_url(field):
+                return request.build_absolute_uri(field.url) if field else None
+
+            profile_data = {
+                # Contact
+                'contact_number': p.contact_number,
+                'secondary_contact': p.secondary_contact,
+                # Present Address
+                'address_line1': p.address_line1,
+                'address_line2': p.address_line2,
+                'city': p.city,
+                'province': p.province,
+                'zip_code': p.zip_code,
+                # Permanent Address
+                'permanent_address_line1': p.permanent_address_line1,
+                'permanent_address_barangay': p.permanent_address_barangay,
+                'permanent_city': p.permanent_city,
+                'permanent_province': p.permanent_province,
+                'permanent_zip_code': p.permanent_zip_code,
+                # Personal
+                'middle_name': p.middle_name,
+                'civil_status': p.get_civil_status_display() if p.civil_status else None,
+                'gender': p.get_gender_display() if p.gender else None,
+                'date_of_birth': p.date_of_birth.isoformat() if p.date_of_birth else None,
+                'citizenship': p.citizenship,
+                'spouse_name': p.spouse_name,
+                'tin': p.tin,
+                'sss_number': p.sss_number,
+                'highest_education': p.get_highest_education_display() if p.highest_education else None,
+                # Employment
+                'employment_category': p.get_employment_category_display() if p.employment_category else None,
+                'employment_status': p.get_employment_status_display() if p.employment_status else None,
+                'buksu_id_number': p.buksu_id_number,
+                'office': p.office,
+                'employer_name': p.employer_name,
+                'employer_address': p.employer_address,
+                'position': p.position,
+                'monthly_income': str(p.monthly_income) if p.monthly_income is not None else None,
+                'net_take_home_pay': str(p.net_take_home_pay) if p.net_take_home_pay is not None else None,
+                'years_employed': p.years_employed,
+                # Parents
+                'father_name': p.father_name,
+                'father_occupation': p.father_occupation,
+                'father_contact': p.father_contact,
+                'mother_name': p.mother_name,
+                'mother_occupation': p.mother_occupation,
+                'mother_contact': p.mother_contact,
+                # Emergency Contact
+                'emergency_contact_name': p.emergency_contact_name,
+                'emergency_contact_number': p.emergency_contact_number,
+                'emergency_contact_relationship': p.emergency_contact_relationship,
+                # Documents
+                'id_photo': file_url(p.id_photo),
+                'payslip': file_url(p.payslip),
+                'coe_document': file_url(p.coe_document),
+            }
+
+            beneficiaries = [
+                {
+                    'name': b.name,
+                    'relationship': b.relationship,
+                    'date_of_birth': b.date_of_birth.isoformat() if b.date_of_birth else None,
+                    'contact_number': b.contact_number,
+                }
+                for b in p.beneficiaries.all()
+            ]
+        except Exception:
+            pass
 
         return Response({
             'id': u.id,
@@ -161,11 +224,11 @@ class MemberApplicationDetailView(AMOBaseView):
             'approved_at': u.approved_at.isoformat() if u.approved_at else None,
             'approved_by': f"{u.approved_by.firstname} {u.approved_by.lastname}" if u.approved_by else None,
             'rejection_reason': u.rejection_reason,
-            'coe_document': coe_document_url,
-            'membership_form': membership_form_url,
             'days_since_applied': days_since,
             'days_remaining': days_remaining,
             'decision_deadline': (u.date_joined.date() + timedelta(days=30)).isoformat(),
+            'profile': profile_data,
+            'beneficiaries': beneficiaries,
         })
 
 
@@ -258,6 +321,8 @@ class MemberDetailView(AMOBaseView):
             'total_savings': str(m.total_savings),
             'total_shared_capital': str(m.total_shared_capital),
             'fixed_deposit': str(m.fixed_deposit) if m.fixed_deposit is not None else None,
+            'subscribed_shares': m.subscribed_shares,
+            'paid_shares': m.paid_shares,
             'verified_employment_status': m.verified_employment_status,
             'employment_status_verified_at': m.employment_status_verified_at.isoformat() if m.employment_status_verified_at else None,
             'employment_status_verified_by': verified_by,
@@ -331,6 +396,45 @@ class MemberFixedDepositView(AMOBaseView):
             'fixed_deposit': str(member.fixed_deposit),
             'membership_type': member.membership_type,
             'calculated_membership_type': member.calculated_membership_type,
+        })
+
+
+class MemberSharesView(AMOBaseView):
+    """AMO records or updates share subscription for a member (By-Laws Section 3c & 6)."""
+
+    def post(self, request, pk):
+        subscribed = request.data.get('subscribed_shares')
+        paid = request.data.get('paid_shares')
+
+        if subscribed is None or paid is None:
+            return Response(
+                {'error': 'Both subscribed_shares and paid_shares are required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            subscribed = int(subscribed)
+            paid = int(paid)
+        except (TypeError, ValueError):
+            return Response(
+                {'error': 'subscribed_shares and paid_shares must be integers.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            member = MemberService.set_shares(pk, subscribed, paid)
+        except Member.DoesNotExist:
+            return Response({'error': 'Member not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'message': (
+                f"Share subscription recorded: {member.subscribed_shares} subscribed, "
+                f"{member.paid_shares} paid."
+            ),
+            'subscribed_shares': member.subscribed_shares,
+            'paid_shares': member.paid_shares,
         })
 
 

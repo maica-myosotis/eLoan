@@ -25,6 +25,7 @@ export default function ProfileScreen({ navigation }) {
   const [saving, setSaving] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [membership, setMembership] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -48,6 +49,7 @@ export default function ProfileScreen({ navigation }) {
     try {
       const data = await profileService.getProfile();
       setProfile(data.profile);
+      setMembership(data.membership || null);
       // Set editable fields
       setContactNumber(data.profile.contact_number || '');
       setAddressLine1(data.profile.address_line1 || '');
@@ -145,7 +147,7 @@ export default function ProfileScreen({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#17236a" />
         <Text style={styles.loadingText}>Loading profile...</Text>
       </SafeAreaView>
     );
@@ -190,6 +192,68 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.userEmail}>{user?.email}</Text>
           <View style={styles.roleBadge}>
             <Text style={styles.roleText}>Applicant</Text>
+          </View>
+        </View>
+
+        {/* Membership */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Membership</Text>
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>Membership Type</Text>
+            <View style={styles.membershipTypeRow}>
+              {membership?.membership_type ? (
+                <View style={[
+                  styles.membershipBadge,
+                  membership.membership_type === 'regular'
+                    ? styles.membershipBadgeRegular
+                    : styles.membershipBadgeAssociate,
+                ]}>
+                  <Text style={[
+                    styles.membershipBadgeText,
+                    membership.membership_type === 'regular'
+                      ? styles.membershipBadgeTextRegular
+                      : styles.membershipBadgeTextAssociate,
+                  ]}>
+                    {membership.membership_type === 'regular' ? 'Regular Member' : 'Associate Member'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.fieldValue}>Pending AMO review</Text>
+              )}
+            </View>
+          </View>
+          <View style={styles.fieldRow}>
+            <View style={[styles.field, { flex: 1, marginRight: 8 }]}>
+              <Text style={styles.fieldLabel}>Subscribed Shares</Text>
+              <Text style={styles.fieldValue}>
+                {membership?.subscribed_shares != null
+                  ? `${membership.subscribed_shares} shares`
+                  : 'Not yet recorded'}
+              </Text>
+            </View>
+            <View style={[styles.field, { flex: 1 }]}>
+              <Text style={styles.fieldLabel}>Paid-Up Shares</Text>
+              <Text style={styles.fieldValue}>
+                {membership?.paid_shares != null
+                  ? `${membership.paid_shares} shares`
+                  : 'Not yet recorded'}
+              </Text>
+            </View>
+          </View>
+          {membership?.member_since && (
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Member Since</Text>
+              <Text style={styles.fieldValue}>
+                {new Date(membership.member_since).toLocaleDateString('en-PH', {
+                  year: 'numeric', month: 'long', day: 'numeric',
+                })}
+              </Text>
+            </View>
+          )}
+          <View style={styles.membershipNote}>
+            <Text style={styles.membershipNoteText}>
+              Regular membership requires a fixed deposit of at least ₱20,000 and permanent/casual/temporary employment status. Minimum subscription: 20 shares, paid-up: 5 shares.
+            </Text>
           </View>
         </View>
 
@@ -425,7 +489,7 @@ const styles = StyleSheet.create({
   editButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 8,
   },
   editButtonText: {
@@ -458,7 +522,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -487,7 +551,7 @@ const styles = StyleSheet.create({
   },
   roleText: {
     fontSize: 12,
-    color: '#6366f1',
+    color: '#17236a',
     fontWeight: '500',
   },
   section: {
@@ -534,7 +598,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   saveButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -547,6 +611,42 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  membershipTypeRow: {
+    flexDirection: 'row',
+  },
+  membershipBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  membershipBadgeRegular: {
+    backgroundColor: '#d1fae5',
+  },
+  membershipBadgeAssociate: {
+    backgroundColor: '#e0e7ff',
+  },
+  membershipBadgeText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  membershipBadgeTextRegular: {
+    color: '#065f46',
+  },
+  membershipBadgeTextAssociate: {
+    color: '#3730a3',
+  },
+  membershipNote: {
+    backgroundColor: '#f0f9ff',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 4,
+  },
+  membershipNoteText: {
+    fontSize: 12,
+    color: '#0369a1',
+    lineHeight: 18,
   },
   menuItem: {
     flexDirection: 'row',
@@ -631,7 +731,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   modalSubmit: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 16,

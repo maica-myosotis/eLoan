@@ -170,7 +170,7 @@ export default function NotificationsScreen({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#17236a" />
         <Text style={styles.loadingText}>Loading notifications...</Text>
       </SafeAreaView>
     );
@@ -202,7 +202,7 @@ export default function NotificationsScreen({ navigation }) {
         )}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6366f1']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#17236a']} />
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   },
   markAllText: {
     fontSize: 12,
-    color: '#6366f1',
+    color: '#17236a',
     fontWeight: '500',
   },
   listContent: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   notificationCardUnread: {
     backgroundColor: '#f5f3ff',
     borderLeftWidth: 3,
-    borderLeftColor: '#6366f1',
+    borderLeftColor: '#17236a',
   },
   iconContainer: {
     width: 40,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#17236a',
     position: 'absolute',
     top: 16,
     right: 16,

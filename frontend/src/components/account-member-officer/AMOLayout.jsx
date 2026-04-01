@@ -54,7 +54,7 @@ export default function AMOLayout() {
       {/* Sidebar */}
       <aside style={{
         width: sidebarOpen ? '260px' : '70px',
-        background: '#1f2937',
+        background: '#17236a',
         padding: '1.5rem',
         transition: 'width 0.3s',
         position: 'fixed',
@@ -77,7 +77,7 @@ export default function AMOLayout() {
           {sidebarOpen && (
             <div>
               <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 700 }}>eLoan</div>
-              <div style={{ color: '#10b981', fontSize: '0.7rem', fontWeight: 500 }}>Account Member Officer</div>
+              <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem', fontWeight: 500 }}>Account Member Officer</div>
             </div>
           )}
         </div>
@@ -95,7 +95,7 @@ export default function AMOLayout() {
                 marginBottom: '0.25rem',
                 borderRadius: '0.5rem',
                 color: isActive(item.path) ? '#fff' : '#9ca3af',
-                background: isActive(item.path) ? '#10b981' : 'transparent',
+                background: isActive(item.path) ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}
@@ -174,7 +174,7 @@ export default function AMOLayout() {
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: '#10b981',
+                background: '#17236a',
                 color: '#fff',
                 borderRadius: '50%',
                 display: 'flex',

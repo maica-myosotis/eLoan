@@ -450,19 +450,25 @@ const ReviewSubmitScreen = ({ navigation }) => {
           <View style={styles.verificationItems}>
             <View style={styles.verificationItem}>
               <Ionicons
-                name={state.faceVerification?.completed ? 'checkmark-circle' : 'close-circle'}
+                name={state.faceVerification?.verified ? 'checkmark-circle' : 'close-circle'}
                 size={24}
-                color={state.faceVerification?.completed ? '#28a745' : '#dc3545'}
+                color={state.faceVerification?.verified ? '#28a745' : '#dc3545'}
               />
               <Text style={styles.verificationLabel}>Face Verification</Text>
+              <Text style={[styles.verificationStatus, { color: state.faceVerification?.verified ? '#28a745' : '#dc3545' }]}>
+                {state.faceVerification?.verified ? 'Passed' : 'Failed'}
+              </Text>
             </View>
             <View style={styles.verificationItem}>
               <Ionicons
-                name={state.faceVerification?.completed ? 'checkmark-circle' : 'close-circle'}
+                name={state.livenessCheck?.verified ? 'checkmark-circle' : 'close-circle'}
                 size={24}
-                color={state.faceVerification?.completed ? '#28a745' : '#dc3545'}
+                color={state.livenessCheck?.verified ? '#28a745' : '#dc3545'}
               />
               <Text style={styles.verificationLabel}>Liveness Check</Text>
+              <Text style={[styles.verificationStatus, { color: state.livenessCheck?.verified ? '#28a745' : '#dc3545' }]}>
+                {state.livenessCheck?.verified ? 'Passed' : 'Failed'}
+              </Text>
             </View>
           </View>
         </View>
@@ -773,6 +779,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#6c757d',
     marginTop: 6,
+  },
+  verificationStatus: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 2,
   },
   noticeBox: {
     flexDirection: 'row',

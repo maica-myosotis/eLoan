@@ -51,14 +51,14 @@ export default function CreditCommitteeLayout() {
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   // Theme color for Credit Committee (purple)
-  const primaryColor = '#8b5cf6';
+  const primaryColor = '#17236a';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f3f4f6' }}>
       {/* Sidebar */}
       <aside style={{
         width: sidebarOpen ? '260px' : '70px',
-        background: '#1f2937',
+        background: '#17236a',
         padding: '1.5rem',
         transition: 'width 0.3s',
         position: 'fixed',
@@ -97,7 +97,7 @@ export default function CreditCommitteeLayout() {
                 marginBottom: '0.25rem',
                 borderRadius: '0.5rem',
                 color: isActive(item.path) ? '#fff' : '#9ca3af',
-                background: isActive(item.path) ? primaryColor : 'transparent',
+                background: isActive(item.path) ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}

@@ -14,6 +14,7 @@ API Structure:
     /api/amo/members/<id>/capital/
     /api/amo/members/<id>/employment-status/        - POST: AMO sets verified employment status
     /api/amo/members/<id>/fixed-deposit/            - POST: AMO enters fixed deposit amount
+    /api/amo/members/<id>/shares/                   - POST: AMO records share subscription (Section 3c & 6)
     /api/amo/appeals/                               - GET pending/all appeals
     /api/amo/appeals/<id>/approve/                  - POST: approve appeal
     /api/amo/appeals/<id>/reject/                   - POST: reject appeal
@@ -50,6 +51,7 @@ urlpatterns = [
     path('members/<int:pk>/capital/', views.MemberCapitalView.as_view(), name='member_capital'),
     path('members/<int:pk>/employment-status/', views.MemberEmploymentStatusView.as_view(), name='member_employment_status'),
     path('members/<int:pk>/fixed-deposit/', views.MemberFixedDepositView.as_view(), name='member_fixed_deposit'),
+    path('members/<int:pk>/shares/', views.MemberSharesView.as_view(), name='member_shares'),
 
     # Appeals
     path('appeals/', views.AppealListView.as_view(), name='appeals'),

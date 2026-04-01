@@ -61,14 +61,14 @@ def _close_loan(loan):
     from django.utils import timezone as tz
 
     try:
-        closed_status, _ = ApplicationStatus.objects.get_or_create(status_name='Closed')
+        completed_status, _ = ApplicationStatus.objects.get_or_create(status_name='Completed')
 
-        # Also try 'Paid' for legacy
-        already_terminal = loan.current_status and loan.current_status.status_name in ('Closed', 'Paid')
+        # Skip if already in a terminal state
+        already_terminal = loan.current_status and loan.current_status.status_name in ('Completed', 'Closed', 'Paid')
         if already_terminal:
             return
 
-        loan.current_status = closed_status
+        loan.current_status = completed_status
         loan.loan_health_status = None
         loan.save(update_fields=['current_status', 'loan_health_status'])
 
@@ -84,8 +84,8 @@ def _close_loan(loan):
         # Notify applicant
         Notification.objects.create(
             user=loan.user,
-            title='Loan Fully Paid – Congratulations!',
-            message=f'Congratulations! Your {loan_label} loan has been fully paid and is now closed. '
+            title='Loan Completed – Congratulations!',
+            message=f'Congratulations! Your {loan_label} loan has been fully paid and is now completed. '
                     f'Thank you for your prompt payments.',
             notification_type='info',
             related_application=loan,
@@ -98,9 +98,9 @@ def _close_loan(loan):
             for bk in bookkeepers:
                 Notification.objects.create(
                     user=bk,
-                    title='Loan Closed – Fully Paid',
+                    title='Loan Completed – Fully Paid',
                     message=f'Loan #{loan.id} for {member_name} ({loan_label}) has been '
-                            f'fully paid and closed. Please finalize the accounting records.',
+                            f'fully paid and completed. Please finalize the accounting records.',
                     notification_type='info',
                     related_application=loan,
                 )
@@ -114,9 +114,9 @@ def _close_loan(loan):
             for amo in amo_users:
                 AMONotification.objects.create(
                     user=amo,
-                    title='Loan Closed – Fully Paid',
+                    title='Loan Completed – Fully Paid',
                     message=f'Loan #{loan.id} for {member_name} ({loan_label}) '
-                            f'has been fully paid and closed.',
+                            f'has been fully paid and completed.',
                     notification_type='info',
                 )
         except Role.DoesNotExist:
@@ -129,9 +129,9 @@ def _close_loan(loan):
             for tr in treasurers:
                 Notification.objects.create(
                     user=tr,
-                    title='Loan Closed – Fully Paid',
+                    title='Loan Completed – Fully Paid',
                     message=f'Loan #{loan.id} for {member_name} ({loan_label}) '
-                            f'has been fully paid and closed.',
+                            f'has been fully paid and completed.',
                     notification_type='info',
                     related_application=loan,
                 )

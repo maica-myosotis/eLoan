@@ -374,7 +374,10 @@ const FaceVerificationScreen = ({ navigation }) => {
       });
 
       setStep('complete');
-      Alert.alert('Success', 'Face verification completed successfully!');
+      Alert.alert(
+        'Verification Complete',
+        '\u2713 Face Verification: Passed\n\u2713 Liveness Check: Passed\n\nYou may now proceed to the next step.'
+      );
     } catch (error) {
       console.error('[SubmitVerification] Verification error:', error);
       console.error('[SubmitVerification] Error message:', error?.message);
@@ -407,16 +410,15 @@ const FaceVerificationScreen = ({ navigation }) => {
   };
 
   const handleContinue = () => {
-    // Check both local step state AND context state for verification
-    const isVerified = step === 'complete' &&
-      state.faceVerification?.completed &&
-      state.faceVerification?.verified;
+    const faceOk = step === 'complete' && state.faceVerification?.completed && state.faceVerification?.verified;
+    const livenessOk = state.livenessCheck?.verified;
 
-    if (!isVerified) {
-      Alert.alert(
-        'Verification Required',
-        'Please complete face verification successfully to continue. Your face must match your ID photo.'
-      );
+    if (!faceOk) {
+      Alert.alert('Verification Required', 'Face verification did not pass. Please retake the verification.');
+      return;
+    }
+    if (!livenessOk) {
+      Alert.alert('Verification Required', 'Liveness check did not pass. Please retake the verification.');
       return;
     }
 
@@ -625,29 +627,58 @@ const FaceVerificationScreen = ({ navigation }) => {
     </View>
   );
 
-  const renderComplete = () => (
-    <View style={styles.completeContainer}>
-      <View style={styles.successIcon}>
-        <Ionicons name="checkmark-circle" size={80} color="#28a745" />
-      </View>
+  const renderComplete = () => {
+    const faceVerified = state.faceVerification?.verified;
+    const livenessVerified = state.livenessCheck?.verified;
 
-      <Text style={styles.completeTitle}>Verification Complete!</Text>
-      <Text style={styles.completeSubtitle}>
-        Your face has been successfully verified
-      </Text>
-
-      {capturedImage && (
-        <View style={styles.capturedImageContainer}>
-          <Image source={{ uri: capturedImage }} style={styles.capturedImage} />
+    return (
+      <View style={styles.completeContainer}>
+        <View style={styles.successIcon}>
+          <Ionicons name="checkmark-circle" size={80} color="#28a745" />
         </View>
-      )}
 
-      <TouchableOpacity style={styles.retakeButton} onPress={retakeVerification}>
-        <Ionicons name="refresh" size={20} color="#0d6efd" />
-        <Text style={styles.retakeButtonText}>Retake Verification</Text>
-      </TouchableOpacity>
-    </View>
-  );
+        <Text style={styles.completeTitle}>Verification Complete!</Text>
+        <Text style={styles.completeSubtitle}>
+          Both checks passed. You may proceed.
+        </Text>
+
+        {/* Verification result badges */}
+        <View style={styles.verificationResults}>
+          <View style={[styles.verificationBadge, faceVerified ? styles.badgePass : styles.badgeFail]}>
+            <Ionicons
+              name={faceVerified ? 'checkmark-circle' : 'close-circle'}
+              size={22}
+              color={faceVerified ? '#28a745' : '#dc3545'}
+            />
+            <Text style={[styles.badgeText, faceVerified ? styles.badgeTextPass : styles.badgeTextFail]}>
+              Face Verification: {faceVerified ? 'Passed' : 'Failed'}
+            </Text>
+          </View>
+          <View style={[styles.verificationBadge, livenessVerified ? styles.badgePass : styles.badgeFail]}>
+            <Ionicons
+              name={livenessVerified ? 'checkmark-circle' : 'close-circle'}
+              size={22}
+              color={livenessVerified ? '#28a745' : '#dc3545'}
+            />
+            <Text style={[styles.badgeText, livenessVerified ? styles.badgeTextPass : styles.badgeTextFail]}>
+              Liveness Check: {livenessVerified ? 'Passed' : 'Failed'}
+            </Text>
+          </View>
+        </View>
+
+        {capturedImage && (
+          <View style={styles.capturedImageContainer}>
+            <Image source={{ uri: capturedImage }} style={styles.capturedImage} />
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.retakeButton} onPress={retakeVerification}>
+          <Ionicons name="refresh" size={20} color="#0d6efd" />
+          <Text style={styles.retakeButtonText}>Retake Verification</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -1066,6 +1097,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6c757d',
     marginBottom: 24,
+  },
+  verificationResults: {
+    width: '100%',
+    marginBottom: 20,
+    gap: 10,
+  },
+  verificationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    gap: 10,
+  },
+  badgePass: {
+    backgroundColor: '#d4edda',
+  },
+  badgeFail: {
+    backgroundColor: '#f8d7da',
+  },
+  badgeText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  badgeTextPass: {
+    color: '#155724',
+  },
+  badgeTextFail: {
+    color: '#721c24',
   },
   capturedImageContainer: {
     marginBottom: 24,

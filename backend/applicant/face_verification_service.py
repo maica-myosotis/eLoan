@@ -323,11 +323,17 @@ class FaceComparisonService:
             threshold = result.get('threshold', cls.get_threshold())
             verified = result.get('verified', False)
 
-            # Convert distance to similarity percentage (0-100)
-            # For cosine distance: similarity = (1 - distance) * 100
-            # Clamp between 0-100
+            # Convert distance to confidence percentage using piecewise linear mapping:
+            #   distance <= 0.60  →  85–100%  (auto-approve zone)
+            #   distance 0.60–0.75 →  60–85%  (manual review zone)
+            #   distance > 0.75   →   0–60%   (reject zone)
             if cls.DISTANCE_METRIC == 'cosine':
-                similarity_percentage = max(0, min(100, (1 - distance) * 100))
+                if distance <= 0.60:
+                    similarity_percentage = 100 - (distance / 0.60) * 15
+                elif distance <= 0.75:
+                    similarity_percentage = 85 - ((distance - 0.60) / 0.15) * 25
+                else:
+                    similarity_percentage = max(0.0, 60 - ((distance - 0.75) / 0.25) * 60)
             else:
                 # For other metrics, use threshold-based calculation
                 similarity_percentage = max(0, min(100, (1 - (distance / threshold)) * 100))
@@ -621,19 +627,20 @@ class FaceComparisonService:
                 face_verification.comparison_distance = Decimal(str(comparison_result['distance'])) if comparison_result['distance'] is not None else None
                 face_verification.comparison_threshold = Decimal(str(comparison_result['threshold'])) if comparison_result['threshold'] is not None else None
 
-                # Determine verification outcome using tiered thresholds
+                # Determine verification outcome using tiered distance thresholds
                 face_config = getattr(settings, 'FACE_VERIFICATION', {})
-                auto_approve_threshold = face_config.get('AUTO_APPROVE_THRESHOLD', 80)
-                review_threshold = face_config.get('REVIEW_THRESHOLD', 55)
+                auto_approve_max_distance = face_config.get('AUTO_APPROVE_MAX_DISTANCE', 0.60)
+                review_max_distance = face_config.get('REVIEW_MAX_DISTANCE', 0.75)
+                distance = comparison_result['distance']
                 similarity = comparison_result['similarity_percentage']
 
-                if similarity >= auto_approve_threshold:
+                if distance <= auto_approve_max_distance:
                     # Auto-approved: face matches ID clearly
                     face_verification.is_match = True
                     face_verification.verification_status = 'Verified'
                     face_verification.verified_at = timezone.now()
                     face_verification.error_message = None
-                    logger.info(f"Face verification PASSED: {similarity:.1f}% similarity (>= {auto_approve_threshold}%)")
+                    logger.info(f"Face verification PASSED: distance={distance:.4f} (<= {auto_approve_max_distance}), similarity={similarity:.1f}%")
 
                     from loans.models import AuditLog
                     AuditLog.objects.create(
@@ -645,43 +652,43 @@ class FaceComparisonService:
                         related_application=application
                     )
 
-                elif similarity >= review_threshold:
+                elif distance <= review_max_distance:
                     # Borderline: allow to proceed but flag for bookkeeper review
                     face_verification.is_match = True
                     face_verification.verification_status = 'Needs Review'
                     face_verification.verified_at = timezone.now()
                     face_verification.error_message = None
-                    logger.info(f"Face verification NEEDS REVIEW: {similarity:.1f}% similarity ({review_threshold}%-{auto_approve_threshold - 1}% range)")
+                    logger.info(f"Face verification NEEDS REVIEW: distance={distance:.4f} ({auto_approve_max_distance}–{review_max_distance} range), similarity={similarity:.1f}%")
 
                     from loans.models import AuditLog
                     AuditLog.objects.create(
                         user=application.user,
-                        action=f"Face verification flagged for review for application #{application.id}: {similarity:.1f}% similarity",
+                        action=f"Face verification flagged for review for application #{application.id}: distance={distance:.4f}",
                         action_type='FACE_VERIFY_REVIEW',
                         severity='WARNING',
                         success=True,
-                        failure_reason=f"Similarity {similarity:.1f}% is in manual review range ({review_threshold}%-{auto_approve_threshold - 1}%)",
+                        failure_reason=f"Distance {distance:.4f} is in manual review range ({auto_approve_max_distance}–{review_max_distance})",
                         related_application=application
                     )
 
                 else:
-                    # Below minimum — rejected
+                    # Above maximum — rejected
                     face_verification.is_match = False
                     face_verification.verification_status = 'Failed'
                     face_verification.error_message = (
-                        f"Face verification failed. Similarity score ({similarity:.1f}%) "
-                        f"is below the minimum threshold ({review_threshold}%)."
+                        f"Face verification failed. Distance score ({distance:.4f}) "
+                        f"exceeds the maximum threshold ({review_max_distance})."
                     )
-                    logger.warning(f"Face verification FAILED: {similarity:.1f}% similarity (< {review_threshold}%)")
+                    logger.warning(f"Face verification FAILED: distance={distance:.4f} (> {review_max_distance}), similarity={similarity:.1f}%")
 
                     from loans.models import AuditLog
                     AuditLog.objects.create(
                         user=application.user,
-                        action=f"Face verification failed for application #{application.id}: Similarity below threshold",
+                        action=f"Face verification failed for application #{application.id}: Distance above threshold",
                         action_type='FACE_VERIFY_FAIL',
                         severity='WARNING',
                         success=False,
-                        failure_reason=f"Similarity {similarity:.1f}% below minimum threshold {review_threshold}%",
+                        failure_reason=f"Distance {distance:.4f} exceeds maximum threshold {review_max_distance}",
                         related_application=application
                     )
 

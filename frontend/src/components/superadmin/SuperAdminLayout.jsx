@@ -53,7 +53,7 @@ export default function SuperAdminLayout() {
       {/* Sidebar */}
       <aside style={{
         width: sidebarOpen ? '260px' : '70px',
-        background: '#1f2937',
+        background: '#17236a',
         padding: '1.5rem',
         transition: 'width 0.3s',
         position: 'fixed',
@@ -69,7 +69,7 @@ export default function SuperAdminLayout() {
           {sidebarOpen && (
             <div>
               <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 700 }}>eLoan</div>
-              <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 500 }}>Super Admin Portal</div>
+              <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 500 }}>Super Admin Portal</div>
             </div>
           )}
         </div>
@@ -87,7 +87,7 @@ export default function SuperAdminLayout() {
                 marginBottom: '0.25rem',
                 borderRadius: '0.5rem',
                 color: isActive(item.path) ? '#fff' : '#9ca3af',
-                background: isActive(item.path) ? '#ef4444' : 'transparent',
+                background: isActive(item.path) ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}
@@ -129,7 +129,7 @@ export default function SuperAdminLayout() {
           </button>
           {user && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: 40, height: 40, background: '#ef4444', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+              <div style={{ width: 40, height: 40, background: '#17236a', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                 {user.firstname?.[0]}{user.lastname?.[0]}
               </div>
               <div>

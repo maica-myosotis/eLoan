@@ -92,7 +92,7 @@ export default function SavingsCapital() {
         {memberInfo && (
           <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>Total Savings: <strong style={{ color: '#10b981' }}>₱{parseFloat(memberInfo.total_savings).toLocaleString()}</strong></span>
-            <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>Total Capital: <strong style={{ color: '#6366f1' }}>₱{parseFloat(memberInfo.total_shared_capital).toLocaleString()}</strong></span>
+            <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>Total Capital: <strong style={{ color: '#17236a' }}>₱{parseFloat(memberInfo.total_shared_capital).toLocaleString()}</strong></span>
             <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>Membership: <strong>{memberInfo.membership_type}</strong></span>
           </div>
         )}

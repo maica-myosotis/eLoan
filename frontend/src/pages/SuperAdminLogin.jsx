@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import authService from '../services/auth.service';
+import PasswordInput from '../components/PasswordInput';
 
 export default function SuperAdminLogin() {
   const navigate = useNavigate();
@@ -94,8 +95,7 @@ export default function SuperAdminLogin() {
 
             <div style={styles.field}>
               <label style={styles.label}>Password</label>
-              <input
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
                 placeholder="••••••••"

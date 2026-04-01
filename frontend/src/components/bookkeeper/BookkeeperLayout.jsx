@@ -54,7 +54,7 @@ export default function BookkeeperLayout() {
       {/* Sidebar */}
       <aside style={{
         width: sidebarOpen ? '260px' : '70px',
-        background: '#1f2937',
+        background: '#17236a',
         padding: '1.5rem',
         transition: 'width 0.3s',
         position: 'fixed',
@@ -75,7 +75,7 @@ export default function BookkeeperLayout() {
           {sidebarOpen && (
             <div>
               <div style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 700 }}>eLoan</div>
-              <div style={{ color: '#6366f1', fontSize: '0.75rem', fontWeight: 500 }}>Bookkeeper Portal</div>
+              <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 500 }}>Bookkeeper Portal</div>
             </div>
           )}
         </div>
@@ -93,7 +93,7 @@ export default function BookkeeperLayout() {
                 marginBottom: '0.25rem',
                 borderRadius: '0.5rem',
                 color: isActive(item.path) ? '#fff' : '#9ca3af',
-                background: isActive(item.path) ? '#6366f1' : 'transparent',
+                background: isActive(item.path) ? 'rgba(255,255,255,0.15)' : 'transparent',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}
@@ -178,7 +178,7 @@ export default function BookkeeperLayout() {
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: '#6366f1',
+                background: '#17236a',
                 color: '#fff',
                 borderRadius: '50%',
                 display: 'flex',

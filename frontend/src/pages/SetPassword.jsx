@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import authService from '../services/auth.service';
+import PasswordInput from '../components/PasswordInput';
 import '../styles/Login.css';
 
 function SetPassword() {
@@ -197,8 +198,7 @@ function SetPassword() {
 
           <div className="form-group">
             <label htmlFor="newPassword">New Password</label>
-            <input
-              type="password"
+            <PasswordInput
               id="newPassword"
               name="newPassword"
               value={formData.newPassword}
@@ -213,8 +213,7 @@ function SetPassword() {
 
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}

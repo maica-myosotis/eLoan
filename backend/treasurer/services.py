@@ -97,12 +97,15 @@ class TreasurerApplicationService:
     @staticmethod
     def get_all_loans_for_monitoring():
         """
-        Get all loans that should be monitored (disbursed, active, overdue, paid).
+        Get all loans that should be monitored, including those awaiting disbursement.
 
         Returns:
             QuerySet: All monitored loans
         """
-        monitored_statuses = ['Disbursed', 'Active', 'Overdue', 'Paid']
+        monitored_statuses = [
+            'Approved – For Disbursement',
+            'Disbursed', 'Active', 'Overdue', 'Paid', 'Completed',
+        ]
         return LoanApplication.objects.filter(
             current_status__status_name__in=monitored_statuses
         ).select_related('user', 'loan_type', 'current_status').order_by('-application_date')
@@ -467,8 +470,9 @@ class DisbursementService:
         active_status, _ = ApplicationStatus.objects.get_or_create(status_name=DisbursementService.STATUS_ACTIVE)
         application.current_status = active_status
         application.activated_at = date.today()
+        application.released_at = timezone.now()
         application.loan_health_status = 'on_time'
-        application.save(update_fields=['current_status', 'activated_at', 'loan_health_status'])
+        application.save(update_fields=['current_status', 'activated_at', 'released_at', 'loan_health_status'])
 
         # Audit trail
         StatusChangeLog.objects.create(

@@ -82,7 +82,7 @@ export default function Dashboard() {
           icon="&#128176;"
           label="Active Loans"
           value={stats.total_active_loans || 0}
-          color="#6366f1"
+          color="#17236a"
           link="/treasurer/monitoring"
         />
         <StatCard

@@ -60,7 +60,7 @@ export default function Reports() {
 
       {/* Stats Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-        <StatCard label="Total Processed (30 days)" value={verification_stats.total} color="#6366f1" />
+        <StatCard label="Total Processed (30 days)" value={verification_stats.total} color="#17236a" />
         <StatCard label="Verified" value={verification_stats.verified} color="#10b981" />
         <StatCard label="Rejected" value={verification_stats.rejected} color="#ef4444" />
         <StatCard label="Approval Rate" value={`${verification_stats.approval_rate.toFixed(1)}%`} color="#f59e0b" />
@@ -75,9 +75,9 @@ export default function Reports() {
             style={{
               padding: '0.75rem 1.5rem',
               border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #6366f1' : '2px solid transparent',
+              borderBottom: activeTab === tab.id ? '2px solid #17236a' : '2px solid transparent',
               background: activeTab === tab.id ? '#fff' : 'transparent',
-              color: activeTab === tab.id ? '#6366f1' : '#6b7280',
+              color: activeTab === tab.id ? '#17236a' : '#6b7280',
               fontWeight: activeTab === tab.id ? 600 : 400,
               cursor: 'pointer',
               borderRadius: '0.375rem 0.375rem 0 0',
@@ -229,7 +229,7 @@ function ReportTable({ title, data, columns }) {
                           <div style={{
                             width: `${percentage}%`,
                             height: '100%',
-                            background: '#6366f1',
+                            background: '#17236a',
                             borderRadius: '4px',
                           }} />
                         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import amoService from '../../services/amo.service';
+import PasswordInput from '../../components/PasswordInput';
 
 export default function AMOSettings() {
   const [profile, setProfile] = useState(null);
@@ -111,8 +112,7 @@ export default function AMOSettings() {
           {[['Current Password', 'current_password'], ['New Password', 'new_password'], ['Confirm New Password', 'confirm_password']].map(([label, key]) => (
             <div key={key} style={{ marginBottom: '1rem' }}>
               <label style={labelStyle}>{label}</label>
-              <input
-                type="password"
+              <PasswordInput
                 value={pwForm[key]}
                 onChange={e => setPwForm({ ...pwForm, [key]: e.target.value })}
                 style={inputStyle}

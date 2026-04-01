@@ -119,7 +119,7 @@ export default function Notifications() {
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllAsRead}
-            style={{ background: '#6366f1', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.375rem', cursor: 'pointer', fontWeight: 500 }}
+            style={{ background: '#17236a', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.375rem', cursor: 'pointer', fontWeight: 500 }}
           >
             Mark All as Read
           </button>
@@ -146,7 +146,7 @@ export default function Notifications() {
                   borderRadius: '12px',
                   padding: '1.25rem',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                  borderLeft: `4px solid ${n.is_read ? '#e5e7eb' : '#6366f1'}`,
+                  borderLeft: `4px solid ${n.is_read ? '#e5e7eb' : '#17236a'}`,
                   display: 'flex',
                   gap: '1rem',
                   alignItems: 'flex-start',
@@ -163,13 +163,13 @@ export default function Notifications() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: n.is_read ? 500 : 700, fontSize: '0.9rem', color: '#1f2937' }}>{n.title}</span>
-                    {!n.is_read && <span style={{ width: 8, height: 8, background: '#6366f1', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />}
+                    {!n.is_read && <span style={{ width: 8, height: 8, background: '#17236a', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />}
                   </div>
                   <p style={{ margin: '0 0 0.5rem', color: '#4b5563', fontSize: '0.875rem', lineHeight: 1.5 }}>{n.message}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.75rem', color: '#9ca3af' }}>
                     <span>{formatTimeAgo(n.created_at)}</span>
                     {n.related_application_id && (
-                      <span style={{ color: '#6366f1' }}>View Application →</span>
+                      <span style={{ color: '#17236a' }}>View Application →</span>
                     )}
                   </div>
                 </div>

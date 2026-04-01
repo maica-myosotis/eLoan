@@ -341,6 +341,11 @@ class ApplicationService {
     const response = await apiService.delete(`/applicant/comakers/${comakerId}/`);
     return response.data;
   }
+
+  async getLoanSchedule(applicationId) {
+    const response = await apiService.get(`/applicant/applications/${applicationId}/schedule/`);
+    return response.data;
+  }
 }
 
 export default new ApplicationService();
