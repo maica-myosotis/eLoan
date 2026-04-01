@@ -122,22 +122,21 @@ class AuthService {
       const response = await axios.post(
         `${API_URL}/register/`,
         formData,
-        {
-          timeout: 60000,
-          headers: { 'Content-Type': 'multipart/form-data' },
-        }
+        { timeout: 60000 }
       );
       if (response.data.user) {
         return { success: true, message: response.data.message, user: response.data.user };
       }
       return { success: false, error: 'Invalid response from server' };
     } catch (error) {
+      console.error('[registerFull] error:', error?.message, '| code:', error?.code, '| status:', error?.response?.status);
+      console.error('[registerFull] response data:', JSON.stringify(error?.response?.data));
       if (error.response?.data) {
         const errors = error.response.data;
         const firstKey = Object.keys(errors)[0];
         if (firstKey) {
           const msg = errors[firstKey];
-          return { success: false, error: Array.isArray(msg) ? msg[0] : msg };
+          return { success: false, error: Array.isArray(msg) ? msg[0] : String(msg) };
         }
       }
       return { success: false, error: 'Unable to register. Please check your internet connection.' };
@@ -357,7 +356,7 @@ class AuthService {
   /**
    * Login / register applicant via Google OAuth.
    * Sends the Google access token to the backend which verifies it
-   * and checks that the email ends with @buksu.edu.ph.
+   * and checks that the email ends with buksu.edu.ph.
    *
    * @param {string} googleAccessToken - Access token from expo-auth-session Google provider
    * @returns {Promise<Object>} { success, user?, error?, isPending?, isNew? }

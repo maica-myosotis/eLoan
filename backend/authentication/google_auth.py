@@ -1,7 +1,7 @@
 """
 Google OAuth Authentication
 
-- GoogleAuthView: For applicants. Verifies Google tokens, creates/logs in @buksu.edu.ph users.
+- GoogleAuthView: For applicants. Verifies Google tokens, creates/logs in buksu.edu.ph users.
 - StaffGoogleAuthView: For staff/admins. Verifies Google tokens, logs in existing staff accounts.
 """
 
@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User, Role
 
-ALLOWED_EMAIL_DOMAIN = '@buksu.edu.ph'
+ALLOWED_EMAIL_DOMAIN = 'buksu.edu.ph'
 
 
 class GoogleAuthView(APIView):
@@ -24,7 +24,7 @@ class GoogleAuthView(APIView):
     POST /api/auth/google/
 
     Authenticate or register an applicant via Google OAuth.
-    Only @buksu.edu.ph email addresses are allowed (verifies BukSU affiliation).
+    Only buksu.edu.ph email addresses are allowed (verifies BukSU affiliation).
 
     Request body:
         { "access_token": "<google_oauth_access_token>" }
@@ -121,7 +121,7 @@ class GoogleAuthView(APIView):
 
         except User.DoesNotExist:
             # New user — create applicant account
-            # Google @buksu.edu.ph login verifies BukSU affiliation.
+            # Google buksu.edu.ph login verifies BukSU affiliation.
             # Account still needs admin approval before loan applications.
             try:
                 applicant_role = Role.objects.get(name='Applicant')

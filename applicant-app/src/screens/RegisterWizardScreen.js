@@ -437,8 +437,10 @@ export default function RegisterWizardScreen({ navigation }) {
       if (!citizenship.trim()) return setError('Citizenship is required.') || false;
       if (!contact.trim()) return setError('Contact number is required.') || false;
       if (!email.trim()) return setError('Email is required.') || false;
-      if (!email.toLowerCase().endsWith('@buksu.edu.ph'))
-        return setError('Only @buksu.edu.ph email addresses are allowed.') || false;
+      const emailLower = email.toLowerCase();
+      const validDomain = emailLower.endsWith('buksu.edu.ph') || (__DEV__ && emailLower.endsWith('gmail.com'));
+      if (!validDomain)
+        return setError('Only buksu.edu.ph email addresses are allowed.') || false;
       if (!password) return setError('Password is required.') || false;
       if (password.length < 8) return setError('Password must be at least 8 characters.') || false;
       if (password !== confirmPassword) return setError('Passwords do not match.') || false;
@@ -461,10 +463,12 @@ export default function RegisterWizardScreen({ navigation }) {
       if (!empStatus) return setError('Employment status is required.') || false;
       if (!office.trim()) return setError('Office/Department is required.') || false;
       if (!monthlyIncome.trim()) return setError('Monthly income is required.') || false;
+      if (isNaN(Number(monthlyIncome)) || Number(monthlyIncome) <= 0) return setError('Monthly income must be a valid positive number.') || false;
     }
     if (step === 4) {
       if (!emergencyName.trim()) return setError('Emergency contact name is required.') || false;
       if (!emergencyNumber.trim()) return setError('Emergency contact number is required.') || false;
+      if (!emergencyRelationship.trim()) return setError('Emergency contact relationship is required.') || false;
     }
     if (step === 6) {
       if (!idPhoto) return setError('2x2 ID photo is required.') || false;
@@ -550,6 +554,7 @@ export default function RegisterWizardScreen({ navigation }) {
       formData.append('lastname', lastname.trim());
       formData.append('email', email.trim().toLowerCase());
       formData.append('password', password);
+      formData.append('confirm_password', confirmPassword);
       formData.append('middle_name', middleName.trim());
       formData.append('civil_status', civilStatus);
       formData.append('spouse_name', spouseName.trim());
@@ -690,7 +695,7 @@ export default function RegisterWizardScreen({ navigation }) {
       </Field>
       <Field label="Email Address" required>
         <Input
-          placeholder="you@buksu.edu.ph" value={email} onChangeText={setEmail}
+          placeholder="you@staff.buksu.edu.ph" value={email} onChangeText={setEmail}
           keyboardType="email-address" autoCapitalize="none" autoCorrect={false}
         />
       </Field>
@@ -841,7 +846,7 @@ export default function RegisterWizardScreen({ navigation }) {
       <Field label="Contact Number" required>
         <Input placeholder="09XXXXXXXXX" value={emergencyNumber} onChangeText={setEmergencyNumber} keyboardType="phone-pad" />
       </Field>
-      <Field label="Relationship">
+      <Field label="Relationship" required>
         <Input placeholder="e.g. Spouse, Parent, Sibling" value={emergencyRelationship} onChangeText={setEmergencyRelationship} autoCapitalize="words" />
       </Field>
     </View>

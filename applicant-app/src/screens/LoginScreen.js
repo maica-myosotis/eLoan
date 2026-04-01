@@ -181,7 +181,7 @@ export default function LoginScreen({ navigation }) {
             )}
           </TouchableOpacity>
 
-          <Text style={styles.googleHint}>Only @buksu.edu.ph accounts are accepted</Text>
+          <Text style={styles.googleHint}>Only buksu.edu.ph accounts are accepted</Text>
 
           {/* Register Link */}
           <View style={styles.registerContainer}>

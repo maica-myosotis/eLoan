@@ -65,7 +65,7 @@ urlpatterns = [
     path('api/auth/set-password/', SetPasswordView.as_view(), name='set_password'),
     path('api/auth/validate-token/', ValidateTokenView.as_view(), name='validate_token'),
 
-    # Google OAuth for applicants (only @buksu.edu.ph emails)
+    # Google OAuth for applicants (only buksu.edu.ph emails)
     path('api/auth/google/', GoogleAuthView.as_view(), name='google_auth'),
 
     # Google OAuth for staff/admins (existing accounts only, no domain restriction)

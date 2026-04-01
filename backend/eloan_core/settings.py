@@ -23,17 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-gngn*p81m4pj)2r5j094rm-9cfioite&b(%761addw^#3j!$%g'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '192.168.1.16',
-    '10.0.0.52',
-]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 
 # Application definition
@@ -202,14 +197,10 @@ LIVENESS_DETECTION = {
 }
 
 # File Encryption Settings
-# CRITICAL: Store ENCRYPTION_KEY in environment variable in production!
-# Generate key: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-from cryptography.fernet import Fernet
+# CRITICAL: ENCRYPTION_KEY must be set in .env — never change it or all encrypted files become unreadable.
+# Generate a key once: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 
-ENCRYPTION_KEY = config(
-    'ENCRYPTION_KEY',
-    default=Fernet.generate_key().decode()  # Auto-generate if not set (DEV ONLY)
-)
+ENCRYPTION_KEY = config('ENCRYPTION_KEY')  # No default — server will refuse to start if missing
 
 # Cache Configuration (for rate limiting)
 # For development: use in-memory cache
@@ -255,18 +246,11 @@ FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 
 # CORS Configuration
 # Allow requests from the frontend application and mobile app
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',       # Web frontend
-    'http://127.0.0.1:3000',       # Web frontend
-    'http://192.168.1.16:3000',   # Web frontend (network access)
-    'http://localhost:8081',       # Expo dev server (default)
-    'http://192.168.1.16:8081',       # Expo dev server
-    'http://localhost:19000',      # Expo dev server (alternative port)
-    'http://localhost:19006',      # Expo web
-]
-
-# For development, you can use CORS_ALLOW_ALL_ORIGINS = True
-# But for production, always specify exact origins above
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:3000,http://127.0.0.1:3000,http://localhost:8081,http://localhost:19000,http://localhost:19006',
+    cast=Csv()
+)
 CORS_ALLOW_CREDENTIALS = True
 
 # Django Unfold Admin Configuration

@@ -45,7 +45,7 @@
     },
     "scheme": "eloan",
     "extra": {
-      "apiUrl": "http://192.168.1.16:8000/api/auth",
+      "apiUrl": "http://192.168.1.11:8000/api/auth",
       "googleClientId": "66164215961-49k2sd9e7q7qvs1355206ldr6o9o81o4.apps.googleusercontent.com",
       "googleAndroidClientId": "66164215961-49k2sd9e7q7qvs1355206ldr6o9o81o4.apps.googleusercontent.com",
         "googleIosClientId": "66164215961-49k2sd9e7q7qvs1355206ldr6o9o81o4.apps.googleusercontent.com",

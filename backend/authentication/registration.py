@@ -175,15 +175,23 @@ class ApplicantRegistrationSerializer(serializers.Serializer):
     """Serializer for applicant self-registration — validates account credentials only."""
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
+    confirm_password = serializers.CharField(write_only=True)
     firstname = serializers.CharField(max_length=50)
     lastname = serializers.CharField(max_length=50)
 
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
+        return data
+
     def validate_email(self, value):
-        """Validate @buksu.edu.ph domain and check uniqueness."""
+        """Validate buksu.edu.ph domain and check uniqueness."""
+        from django.conf import settings
         value = value.lower().strip()
-        if not value.endswith('@buksu.edu.ph'):
+        allowed = value.endswith('buksu.edu.ph') or (settings.DEBUG and value.endswith('gmail.com'))
+        if not allowed:
             raise serializers.ValidationError(
-                'Only @buksu.edu.ph email addresses are allowed to register.'
+                'Only buksu.edu.ph email addresses are allowed to register.'
             )
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError('An account with this email already exists.')
@@ -191,6 +199,7 @@ class ApplicantRegistrationSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         """Create a new applicant user with pending status."""
+        validated_data.pop('confirm_password', None)
         try:
             applicant_role = Role.objects.get(name='Applicant')
         except Role.DoesNotExist:
