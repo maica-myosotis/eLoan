@@ -121,6 +121,59 @@ def _jwt_for(user):
 # PART A — FaceComparisonService
 # ===========================================================================
 
+class TestApplicantStatusHandling(TestCase):
+    """Regression coverage for applicant status buckets used by eligibility/dashboard."""
+
+    def test_approved_for_disbursement_blocks_new_application(self):
+        from applicant.models import Member, Savings
+        from applicant.services import LoanApplicationService
+        from applicant.utils import ApplicationStatuses
+        from loans.models import ApplicationStatus
+
+        user = _make_applicant_user('status_block@test.com')
+        member = Member.objects.create(user=user)
+        Savings.objects.create(member=member, amount=Decimal('200.00'))
+
+        application = _make_loan_application(user)
+        application.current_status, _ = ApplicationStatus.objects.get_or_create(
+            status_name=ApplicationStatuses.APPROVED_FOR_DISBURSEMENT
+        )
+        application.save(update_fields=['current_status'])
+
+        result = LoanApplicationService.check_can_apply(user)
+
+        self.assertFalse(result['can_apply'])
+        self.assertIn('active loan', result['reason'].lower())
+
+    def test_dashboard_counts_current_active_loan_statuses(self):
+        from applicant.services import ApplicantDashboardService
+        from applicant.utils import ApplicationStatuses
+        from loans.models import ApplicationStatus
+
+        user = _make_applicant_user('status_dashboard@test.com')
+        for status_name in [
+            ApplicationStatuses.APPROVED_FOR_DISBURSEMENT,
+            ApplicationStatuses.ACTIVE,
+            ApplicationStatuses.OVERDUE,
+        ]:
+            application = _make_loan_application(user)
+            application.current_status, _ = ApplicationStatus.objects.get_or_create(
+                status_name=status_name
+            )
+            application.save(update_fields=['current_status'])
+
+        completed = _make_loan_application(user)
+        completed.current_status, _ = ApplicationStatus.objects.get_or_create(
+            status_name=ApplicationStatuses.COMPLETED
+        )
+        completed.save(update_fields=['current_status'])
+
+        stats = ApplicantDashboardService.get_dashboard_stats(user)
+
+        self.assertEqual(stats['approved_loans'], 3)
+        self.assertTrue(stats['has_active_loan'])
+
+
 class TestDetectFace(TestCase):
     """
     TC-FV-001 through TC-FV-006

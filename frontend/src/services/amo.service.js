@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authService from './auth.service';
 
-const API_URL = 'http://localhost:8000/api/amo';
+const API_URL = import.meta.env.VITE_API_URL?.replace('/auth', '/amo') || 'http://localhost:8000/api/amo';
 
 const getAuthHeaders = () => {
   const token = authService.getAccessToken();

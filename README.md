@@ -141,6 +141,10 @@ DEFAULT_FROM_EMAIL=your@gmail.com
 # Frontend URL (used in password reset emails)
 FRONTEND_URL=http://<your-local-ip>:3000
 
+# Runtime
+DJANGO_DEBUG=True
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+
 # File Encryption Key
 # IMPORTANT: Copy this exactly from the original machine.
 # Generating a new key will make all existing uploaded documents unreadable.
@@ -176,10 +180,10 @@ cd frontend
 npm install
 ```
 
-Search for the hardcoded IP and replace it with your machine's local IP:
+Create `frontend/.env`:
 
-```bash
-grep -rn "10.255" src/
+```env
+VITE_API_URL=http://<your-local-ip>:8000/api/auth
 ```
 
 Then start the dev server:
@@ -199,15 +203,12 @@ cd applicant-app
 npm install
 ```
 
-Update the API URL in [applicant-app/app.json](applicant-app/app.json):
+Set the API URL before starting Expo:
 
-```json
-"extra": {
-  "apiUrl": "http://<your-local-ip>:8000/api/auth"
-}
+```bash
+# Windows PowerShell
+$env:EXPO_PUBLIC_API_URL="http://<your-local-ip>:8000/api/auth"
 ```
-
-Also check [applicant-app/src/services/apiService.js](applicant-app/src/services/apiService.js) for any hardcoded IPs and replace them.
 
 Install Expo CLI if not already installed:
 
@@ -233,7 +234,8 @@ Scan the QR code with the **Expo Go** app on your phone. Your phone and computer
 - [ ] `venv` created at project root and activated
 - [ ] `backend/.env` created with correct DB credentials and IP
 - [ ] `ENCRYPTION_KEY` copied exactly from original machine
-- [ ] Local IP updated in `app.json`, `apiService.js`, and frontend service files
+- [ ] `VITE_API_URL` set in `frontend/.env`
+- [ ] `EXPO_PUBLIC_API_URL` set before starting the applicant app
 - [ ] Backend dependencies installed in the correct order (tensorflow → mediapipe → requirements.txt)
 - [ ] `python manage.py migrate` ran successfully
 - [ ] Superuser created

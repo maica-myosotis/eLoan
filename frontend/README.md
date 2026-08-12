@@ -37,7 +37,8 @@ Modern React-based frontend for the eLoan Management System with role-based auth
    cp .env.example .env
    ```
 
-   Edit `.env` and configure your API URL if different from default:
+   Edit `.env` and configure the backend auth API URL if different from default.
+   The role-specific services derive their module URLs from this value:
    ```
    VITE_API_URL=http://localhost:8000/api/auth
    ```

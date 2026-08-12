@@ -48,17 +48,10 @@ class ApplicantDashboardService:
 
         total = applications.count()
         pending = applications.filter(
-            current_status__status_name__in=[
-                ApplicationStatuses.SUBMITTED,
-                ApplicationStatuses.VERIFIED,
-                ApplicationStatuses.PENDING_CREDIT
-            ]
+            current_status__status_name__in=ApplicationStatuses.IN_REVIEW_STATUSES
         ).count()
         approved = applications.filter(
-            current_status__status_name__in=[
-                ApplicationStatuses.APPROVED,
-                ApplicationStatuses.DISBURSED
-            ]
+            current_status__status_name__in=ApplicationStatuses.ACTIVE_LOAN_STATUSES
         ).count()
         rejected = applications.filter(
             current_status__status_name__in=[
@@ -74,10 +67,7 @@ class ApplicantDashboardService:
 
         # Get active loan (if any)
         active_loan = applications.filter(
-            current_status__status_name__in=[
-                ApplicationStatuses.APPROVED,
-                ApplicationStatuses.DISBURSED
-            ]
+            current_status__status_name__in=ApplicationStatuses.ACTIVE_LOAN_STATUSES
         ).first()
 
         return {
@@ -167,14 +157,9 @@ class LoanApplicationService:
                 }
 
         # Check for active loans
-        active_statuses = [
-            ApplicationStatuses.APPROVED,
-            ApplicationStatuses.DISBURSED
-        ]
-
         active_loan = LoanApplication.objects.filter(
             user=user,
-            current_status__status_name__in=active_statuses
+            current_status__status_name__in=ApplicationStatuses.ACTIVE_LOAN_STATUSES
         ).first()
 
         if active_loan:
@@ -185,16 +170,9 @@ class LoanApplicationService:
             }
 
         # Check for pending applications
-        pending_statuses = [
-            ApplicationStatuses.DRAFT,
-            ApplicationStatuses.SUBMITTED,
-            ApplicationStatuses.VERIFIED,
-            ApplicationStatuses.PENDING_CREDIT
-        ]
-
         pending_app = LoanApplication.objects.filter(
             user=user,
-            current_status__status_name__in=pending_statuses
+            current_status__status_name__in=ApplicationStatuses.PENDING_STATUSES
         ).first()
 
         if pending_app:

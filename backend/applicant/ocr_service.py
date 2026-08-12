@@ -15,10 +15,12 @@ import logging
 from datetime import datetime
 from typing import Dict, Optional, Tuple
 from difflib import SequenceMatcher
+from django.conf import settings
 
 try:
-    import pytesseract 
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Update this path if Tesseract is installed elsewhere
+    import pytesseract
+    if getattr(settings, 'TESSERACT_CMD', ''):
+        pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_CMD
     from PIL import Image, ImageEnhance, ImageFilter
     TESSERACT_AVAILABLE = True
 except ImportError:

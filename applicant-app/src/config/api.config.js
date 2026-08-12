@@ -5,8 +5,8 @@ import Constants from 'expo-constants';
  * Handles different environments (dev, production) and platforms (Android, iOS)
  */
 const getApiUrl = () => {
-  // 1. Check environment variable from app.json extra config
-  const envApiUrl = Constants.expoConfig?.extra?.apiUrl;
+  // 1. Check environment variables / Expo extra config
+  const envApiUrl = process.env.EXPO_PUBLIC_API_URL || Constants.expoConfig?.extra?.apiUrl;
   if (envApiUrl) {
     return envApiUrl;
   }
@@ -24,8 +24,7 @@ const getApiUrl = () => {
       : 'http://localhost:8000/api/auth';
   }
 
-  // 3. Production fallback (configure this for production deployment)
-  return 'https://your-production-api.com/api/auth';
+  throw new Error('Missing API URL. Set EXPO_PUBLIC_API_URL or expo.extra.apiUrl.');
 };
 
 export const API_URL = getApiUrl();

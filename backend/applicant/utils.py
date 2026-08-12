@@ -272,15 +272,46 @@ class ApplicationStatuses:
     SUBMITTED = 'Submitted'
     VERIFIED = 'Verified by Bookkeeper'
     REJECTED_BOOKKEEPER = 'Rejected by Bookkeeper'
+    PENDING_TREASURER = 'Pending Treasurer Review'
+    APPROVED_TREASURER = 'Approved by Treasurer'
+    REJECTED_TREASURER = 'Rejected by Treasurer'
     PENDING_CREDIT = 'Pending Credit Committee'
     APPROVED = 'Approved by Credit Committee'
     REJECTED_CREDIT = 'Rejected by Credit Committee'
     RETURNED = 'Returned to Treasurer'
     APPROVED_FOR_DISBURSEMENT = 'Approved – For Disbursement'
     ACTIVE = 'Active'
+    OVERDUE = 'Overdue'
     DISBURSED = 'Disbursed'
     PAID = 'Paid'
+    COMPLETED = 'Completed'
     CLOSED = 'Closed'
+    WITHDRAWN = 'Withdrawn'
 
-    ACTIVE_STATUSES = [SUBMITTED, VERIFIED, PENDING_CREDIT, APPROVED, APPROVED_FOR_DISBURSEMENT, ACTIVE, DISBURSED]
-    TERMINAL_STATUSES = [REJECTED_BOOKKEEPER, REJECTED_CREDIT, PAID, CLOSED]
+    IN_REVIEW_STATUSES = [
+        SUBMITTED,
+        VERIFIED,
+        PENDING_TREASURER,
+        APPROVED_TREASURER,
+        PENDING_CREDIT,
+        RETURNED,
+    ]
+    PENDING_STATUSES = [DRAFT, *IN_REVIEW_STATUSES]
+    ACTIVE_LOAN_STATUSES = [
+        APPROVED,
+        APPROVED_FOR_DISBURSEMENT,
+        ACTIVE,
+        OVERDUE,
+        DISBURSED,
+    ]
+    BLOCKING_STATUSES = [*PENDING_STATUSES, *ACTIVE_LOAN_STATUSES]
+    ACTIVE_STATUSES = BLOCKING_STATUSES
+    TERMINAL_STATUSES = [
+        REJECTED_BOOKKEEPER,
+        REJECTED_TREASURER,
+        REJECTED_CREDIT,
+        PAID,
+        COMPLETED,
+        CLOSED,
+        WITHDRAWN,
+    ]

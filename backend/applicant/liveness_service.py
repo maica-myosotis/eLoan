@@ -192,9 +192,12 @@ class MediaPipeLivenessService:
                     checks_passed += 1
 
             # --- Check 2: Head pose ---
-            pose = {'yaw': 0.0, 'pitch': 0.0, 'roll': 0.0}
-            if result.facial_transformation_matrixes:
-                pose = self._head_pose(result.facial_transformation_matrixes[0])
+            transform_matrix = (
+                result.facial_transformation_matrixes[0]
+                if result.facial_transformation_matrixes
+                else None
+            )
+            pose = self._head_pose(transform_matrix)
 
             has_natural_pose = bool(
                 abs(pose['yaw'])   < self.HEAD_TURN_THRESHOLD and

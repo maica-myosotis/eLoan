@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
@@ -195,6 +195,11 @@ LIVENESS_DETECTION = {
     'HEAD_NOD_THRESHOLD': 10,  # Max pitch angle in degrees for natural pose
     'DEFAULT_METHOD': 'combined',  # Default detection method: blink, head_turn, combined
 }
+
+# OCR Settings
+# Leave blank to use the system PATH. Set TESSERACT_CMD in .env when Tesseract
+# is installed in a non-standard location.
+TESSERACT_CMD = config('TESSERACT_CMD', default='')
 
 # File Encryption Settings
 # CRITICAL: ENCRYPTION_KEY must be set in .env — never change it or all encrypted files become unreadable.
